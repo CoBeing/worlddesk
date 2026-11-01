@@ -49,3 +49,11 @@ Chinese language radio stations are prioritized, followed by global streams. On-
 The home view opens with licensed real photographs, NASA DSCOVR EPIC Earth images, and JMA Himawari infrared cloud observations. Use Previous / Next and Keep Exploring to navigate. Captions show source, author, license, and observation/photo date; these are not live cameras. Satellite frames are delayed or unavailable at times. See docs/MEDIA_CREDITS.md.
 
 Flight Watch shows openly received aircraft ADS-B positions (adsb.lol ODbL 1.0), not FR24. Choose a current or preset airspace: Shanghai, Beijing, Pearl River Delta, Hong Kong, Tokyo, Singapore, or London. Click a plane to see reported aircraft type, altitude, speed, heading, and position age; toggle Follow to recenter after subsequent reports. Only reported coordinates are shown, with no inferred origin or destination. Refreshing happens while the view is active (about once per minute), not as a background aircraft monitor. The third-party source sees the chosen geographic center and the requesting IP. The development browser has a local test proxy; the installed Mac app uses a fixed native HTTPS request. See docs/FLIGHT_DATA.md.
+
+## Flight Live and map options (Preview 0.1.0-preview.4)
+
+Choose **Flight Live / 飞行现场** on the left. The map fills the main part of the window. Use the aircraft list toggle to reclaim the full canvas. Click a plane to open its details (heading, speed, altitude, freshness) and optionally follow it; close the right drawer with ×. Flight observations refresh about every minute while the view is visible. The four cards are **current snapshot values**, not 24-hour aggregates. Use the search field to find a callsign, aircraft type or registration. The city/region selector changes the airspace, not the UI language.
+
+The map switch offers a keyless OpenFreeMap vector map (Detailed), a dark variant (Night) and an offline Natural Earth outline. If online tiles fail, the app falls back to its bundled sketch. Detailed tile coverage/access from mainland China is not guaranteed; no raw location, API credential or browsing history is sent to a WorldDesk backend.
+
+The main menu now has five entries. In World Pulse, the weaker event categories are filtered using secondary tabs instead of competing with immersive/flight observation at the top level.

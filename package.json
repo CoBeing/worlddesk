@@ -1,7 +1,7 @@
 {
   "name": "worlddesk",
   "private": true,
-  "version": "0.1.0-preview.3",
+  "version": "0.1.0-preview.4",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 1420",
@@ -13,8 +13,10 @@
     "bridge:prepare": "node scripts/prepare-bridge.mjs"
   },
   "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "@tauri-apps/api": "^2.9.0",
     "leaflet": "^1.9.4",
+    "maplibre-gl": "^6.16.0",
     "suncalc": "^2.1.1",
     "topojson-client": "^3.1.0",
     "world-atlas": "^2.0.2"

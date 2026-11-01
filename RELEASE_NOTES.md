@@ -1,16 +1,20 @@
-# WorldDesk v0.1.0-preview.3 — A world worth watching
+# WorldDesk v0.1.0-preview.4 — Map first, real-time discovery
 
-A Mac Preview with a genuinely watchable homepage and real aircraft observations.
+**macOS Apple Silicon · unsigned preview · no account required.**
 
-Try first:
-- World Cinema: real photos of Guangxi, Zhangjiajie, the Great Wall and Sichuan highlands. Each has author credit, license and date.
-- Space Earth: NASA DSCOVR EPIC captured frames, with timestamps and archived fallback.
-- East Asia: JMA Himawari infrared satellite cloud images and 10-minute timeline (recorded observations, not a live video).
-- Flight Watch: ODbL ADS-B position snapshots from adsb.lol around Chinese and international airspaces. Click/follow selected aircraft, and view type, altitude, heading, speed and position age. About 60-second foreground refresh.
-- Existing Chinese/English UI, coarse-IP/manual cities, radio streams, world events, local favorites and bundled Local Bridge.
+### Better to look at
 
-Important distinctions:
-- FR24 data are not accessed. Its consumer website prohibits automated scraping; its API is separately licensed and credit-metered. The Preview data source is adsb.lol, with incomplete coverage. Obtain source maintainer approval before broad production use.
-- Images are real photos and satellite captures, not live webcams. Photos retain their Creative Commons licenses, with original source/photographer displayed.
-- No CoBeing account, SDR, ship tracking or full 3D Cesium/God's Eye View embedding yet.
-- Unsigned macOS Apple Silicon package only. Check download SHA-256; Windows/Linux validation follows later.
+- **Flight Live full-canvas experience**. The aircraft map expands across the whole app content, and the usual three-column squeeze is gone. Collapse the aircraft list to explore; a separate details drawer only appears when you select an aircraft.
+- **Useful detailed map**. OpenFreeMap vector roads and city names, with Detailed / Night / bundled Offline outline modes. Offline includes small curated city labels. The app falls back if the external tile host fails (regional access varies).
+- **Current aircraft facts**. Reported aircraft now, fastest aircraft, highest flight and nearest to observation center, all derived from the ADSB.lol snapshot, with a current-session sampling count instead of a fake 24h chart.
+- **Less navigation, more content**. Five primary entries: immersive real-world scenes, Flight Live, World Pulse, World Radio and Favorites. Nearby, Sky, Nature Events and Earthquakes become filters inside World Pulse.
+- **Dynamic content picks**. Current sunset prediction, aircraft discovery, JMA East Asia satellite observations and licensed Chinese-language radio become directly clickable cards; fewer empty screens.
+- Faster World Cinema startup: MapLibre vector renderer only loads when Flight Live is actually opened.
+
+### Data and product boundaries
+
+- The aircraft source is **ADSB.lol ODbL 1.0**, not FR24. China coverage is incomplete, and flight origins/destinations are not claimed.
+- Counts and extreme-value cards are **current position reports**, not rolling 24h totals.
+- Live public data, radio and online maps depend on external provider connectivity; the Chinese network and access policies may vary. Offline coastline remains available.
+- No CoBeing login, chat provider, SDR activation or background Local Bridge service.
+- Mac Apple Silicon **unsigned/unnotarized** package only; use the GitHub Release checksum. Windows/Linux remain postponed.

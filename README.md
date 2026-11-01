@@ -7,7 +7,10 @@ WorldDesk is an independent CoBeing ecosystem application. The CoBeing platform 
 ## Preview features — implemented
 
 - **随便看看 · World Cinema**: six genuinely sourced, watchable scenes including Yangshuo, Zhangjiajie, the Great Wall, Sichuan highlands, NASA DSCOVR EPIC Earth imagery, and JMA Himawari infrared cloud observations with capture dates, credits, and playback/step controls. Photos are archives; satellite images are delayed observations, not live webcams.
-- **航班追踪 · Flight Watch**: real open ADS-B aircraft snapshots for selected China and world airspace regions, with callsign, aircraft type, registration, reported altitude, ground speed, heading, location age, and follow mode. On desktop only; fetched on entering the view and about every 60 seconds while visible. Source is adsb.lol ODbL 1.0, not FR24 data.
+- **飞行现场 · Flight Live**: a **large, interactive map-first** view (default detailed map), collapsible aircraft list, expandable flight details, callsign/type/altitude/speed/heading, real following, search and airborne filter. Region presets include Chinese and overseas airspaces. Four derived live cards show *aircraft now / fastest / highest / nearest*. Sampling counts are **since this app opened**, never fabricated 24-hour traffic. The source remains adsb.lol ODbL 1.0, **not** FR24.
+- **地图三模式**: **OpenFreeMap** detailed or night vector map with roads/city labels, or bundled Natural Earth offline outline with a compact city catalog. Online map access from mainland China may vary; the app falls back rather than freezing. The online renderer loads on demand when entering flight view to keep the world cinema fast.
+- **收敛的世界动态**: only five primary entries — World Cinema, Flight Live, World Pulse, World Radio and Favorites. Sky, Nearby, Nature Events and Earthquakes are World Pulse subfilters. The viewing sidebar shows sourced, actionable observations: local sunset, current aircraft (when available), delayed Himawari East Asia imagery, Chinese radio.
+
 - **地球观察**: real earthquake observations from USGS and natural events from NASA EONET on a local Natural Earth coastline map.
 - **听听世界**: try direct Internet radio streams from Radio Browser. Streams can be blocked or use unsupported codecs.
 - **收藏与分享**: favorites stored in this app locally, share official event and source links. No automatic cloud sync.
@@ -48,7 +51,7 @@ Source observations can be delayed and must not be used for emergency, aviation 
 
 - App: Apache-2.0 (this project).
 - Local Bridge: Apache-2.0 (https://github.com/eaopen/local-bridge).
-- Leaflet: BSD-2-Clause. Simplified coastline data: Natural Earth (public domain) via world-atlas/topojson-client; no external map tile CDN.
+- Leaflet: BSD-2-Clause. MapLibre GL JS: BSD-3-Clause; @maplibre/maplibre-gl-leaflet: ISC. Detailed styles/tiles are served by OpenFreeMap (https://openfreemap.org/), © OpenMapTiles / © OpenStreetMap contributors, with attribution shown. Natural Earth public-domain land outlines are bundled for offline fallback; the online tile host requires network access.
 - Event data: USGS Earthquake Feeds and NASA EONET APIs.
 - Radio Browser is a station directory, not a WorldDesk rebroadcast server. Stations own their streams and licensing.
 - God’s Eye View is a separate upstream project; its source or licensed data are not copied into WorldDesk.

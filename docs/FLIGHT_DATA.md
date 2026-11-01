@@ -24,3 +24,11 @@ Flightradar24's Terms of Service (updated June 23, 2026) prohibit automated retr
 ## Local receiver in the future
 
 WorldDesk may later connect an explicitly enabled readsb / dump1090 / SDR receiver via Local Bridge, using a labeled local data source. Opening Flight Watch never automatically turns on a microphone, radio, serial port or messaging Provider.
+
+## WorldDesk map-first experience (Preview 0.1.0-preview.4)
+
+Flight Live uses an enlarged airspace map with an optional aircraft list and a closable detail drawer. Selecting an aircraft shows only sourced attributes and can follow its current reports. The four context cards (reported count / fastest / highest / nearest) are derived from **the current snapshot**. A small sample count is taken once per 30+ seconds in the current app session; it is not a pre-existing 24-hour timeline and is never presented as such. Closing WorldDesk ends the sample history.
+
+The detailed map uses [OpenFreeMap](https://openfreemap.org/) (light and dark styles via MapLibre GL/Leaflet); attribution is shown at all times. Its connectivity in mainland China needs user verification. The built-in Natural Earth outline and curated city names are the explicit fallback; there is no dependence on unauthorized Gaode/Tianditu keys or generic OSMF production raster servers. Coordinates are displayed in WGS84, with no GCJ-02 overlay mismatch.
+
+Flight and map observations do not imply origin/destination, actual routes or 24-hour history. For broader commercial distribution, discuss ADSB.lol key/licensing and availability with the source maintainers.
