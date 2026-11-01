@@ -66,18 +66,22 @@ jobs:
             macos)
               APP=$(find src-tauri/target/release/bundle/macos -maxdepth 1 -type d -name '*.app' -print -quit)
               test -n "$APP"
-              ditto -c -k --keepParent "$APP" "release-assets/WorldDesk-Preview-macos-$(uname -m).zip"
+              ARCH=$(uname -m)
+              ditto -c -k --keepParent "$APP" "release-assets/WorldDesk-Preview-macos-$ARCH.zip"
+              CHECKSUM_FILE="SHA256-macos-$ARCH.txt"
               ;;
             windows)
               FILE=$(find src-tauri/target/release/bundle/nsis -name '*.exe' -type f -print -quit)
               test -n "$FILE"
               cp "$FILE" release-assets/WorldDesk-Preview-windows-x64.exe
+              CHECKSUM_FILE="SHA256-windows-x64.txt"
               ;;
             linux)
               FILE=$(find src-tauri/target/release/bundle/deb -name '*.deb' -type f -print -quit)
               test -n "$FILE"
               cp "$FILE" release-assets/WorldDesk-Preview-linux-x64.deb
+              CHECKSUM_FILE="SHA256-linux-x64.txt"
               ;;
           esac
-          node -e "const fs=require('fs'),crypto=require('crypto');const p='release-assets';let s='';for(const f of fs.readdirSync(p)){s+=crypto.createHash('sha256').update(fs.readFileSync(p+'/'+f)).digest('hex')+'  '+f+'\n'}fs.writeFileSync(p+'/SHA256-'+process.env.OS_LABEL+'.txt',s)"
+          CHECKSUM_FILE="$CHECKSUM_FILE" node -e "const fs=require('fs'),crypto=require('crypto');const p='release-assets';let s='';for(const f of fs.readdirSync(p)){s+=crypto.createHash('sha256').update(fs.readFileSync(p+'/'+f)).digest('hex')+'  '+f+'\n'}fs.writeFileSync(p+'/'+process.env.CHECKSUM_FILE,s)"
           gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber
