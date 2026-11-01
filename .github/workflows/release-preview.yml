@@ -1,0 +1,83 @@
+name: Unsigned WorldDesk Preview
+
+on:
+  push:
+    tags:
+      - 'v*-preview.*'
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "WorldDesk $GITHUB_REF_NAME (unsigned)" --notes-file RELEASE_NOTES.md --prerelease --verify-tag
+  build:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: macos-15, label: macos, bundle: app}
+          - {os: windows-2022, label: windows, bundle: nsis}
+          - {os: ubuntu-24.04, label: linux, bundle: deb}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: eaopen/local-bridge
+          ref: e939910ec45c45f1a0bc97870eed763da76c3d20
+          path: bridge
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.90.0'
+      - if: matrix.label == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev patchelf
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Build bundled Local Bridge
+        env:
+          LOCAL_BRIDGE_REPO: ./bridge
+        run: node scripts/prepare-bridge.mjs
+      - name: Build unsigned app
+        run: npm run tauri:build -- --bundles ${{ matrix.bundle }}
+      - name: Package and upload
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OS_LABEL: ${{ matrix.label }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          case "$OS_LABEL" in
+            macos)
+              APP=$(find src-tauri/target/release/bundle/macos -maxdepth 1 -type d -name '*.app' -print -quit)
+              test -n "$APP"
+              ditto -c -k --keepParent "$APP" "release-assets/WorldDesk-Preview-macos-$(uname -m).zip"
+              ;;
+            windows)
+              FILE=$(find src-tauri/target/release/bundle/nsis -name '*.exe' -type f -print -quit)
+              test -n "$FILE"
+              cp "$FILE" release-assets/WorldDesk-Preview-windows-x64.exe
+              ;;
+            linux)
+              FILE=$(find src-tauri/target/release/bundle/deb -name '*.deb' -type f -print -quit)
+              test -n "$FILE"
+              cp "$FILE" release-assets/WorldDesk-Preview-linux-x64.deb
+              ;;
+          esac
+          node -e "const fs=require('fs'),crypto=require('crypto');const p='release-assets';let s='';for(const f of fs.readdirSync(p)){s+=crypto.createHash('sha256').update(fs.readFileSync(p+'/'+f)).digest('hex')+'  '+f+'\n'}fs.writeFileSync(p+'/SHA256-'+process.env.OS_LABEL+'.txt',s)"
+          gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber
