@@ -190,5 +190,5 @@ export function createCinema({onScene,lang='zh',onToast}){
  show()
  void refreshEarth()
  refreshClouds()
- return {selected,selectId(id){const i=scenes.findIndex(s=>s.id===id);if(i>=0)set(i)},next,prev,updateLanguage,stop,refreshEarth,refreshClouds}
+ return {selected,getScene:id=>byId.get(id)||null,selectId(id){const i=scenes.findIndex(s=>s.id===id);if(i>=0)set(i)},next,prev,updateLanguage,stop,refreshEarth,refreshClouds}
 }
