@@ -1,0 +1,50 @@
+# WorldDesk Preview
+
+**打开世界，随时去远方。** Explore the real world, even when you are staying home.
+
+WorldDesk is an independent CoBeing ecosystem application. The CoBeing platform stays in the background: no registration is necessary to explore.
+
+## Preview features — implemented
+
+- **世界盲盒**: a random sourced world event or radio station.
+- **地球观察**: real earthquake observations from USGS and natural events from NASA EONET on a Leaflet/OpenStreetMap map.
+- **听听世界**: try direct Internet radio streams from Radio Browser. Streams can be blocked or use unsupported codecs.
+- **收藏与分享**: favorites stored in this app locally, share official event and source links. No automatic cloud sync.
+- **Local Bridge included**: the desktop install carries the open-source eaopen/local-bridge runtime as a bundled sidecar. The app reads the actual bundled binary version, with an opt-in self-test. No separate installation, background service, model account or third-party communications permission is required.
+- **Optional CoBeing and 3D links**: links to CoBeing and God’s Eye View. Long-term memory, CoBeing login and the full 3D engine are not embedded in this Preview.
+
+## Download
+
+**[Get WorldDesk Preview on GitHub Releases](https://github.com/CoBeing/worlddesk/releases)**
+
+Unsigned and unnotarized packages are for testing. Read [install and safety notes](docs/PREVIEW_INSTALL.md) and verify the SHA-256 checksum for the exact downloaded file. There is no code signing, automatic updater or login service.
+
+## Build from source
+
+Requirements: Node.js 24+, Rust 1.90+, Tauri 2 native platform prerequisites, and a checked-out Local Bridge source tree.
+
+    git clone https://github.com/CoBeing/worlddesk.git
+    git clone https://github.com/eaopen/local-bridge.git
+    cd worlddesk
+    npm ci
+    npm run bridge:prepare
+    npm run tauri:build
+
+The prepare script defaults to a sibling directory named local-bridge. Use LOCAL_BRIDGE_REPO to override. Preview CI pins a specific Local Bridge commit for reproducible packaging.
+
+Use npm run dev for a browser-only preview with no native privileges, and npm test for data parser tests.
+
+## Privacy and boundaries
+
+WorldDesk requests only public, read-only feeds; it does not automatically read user messages, files, microphones or SDR devices. Local Bridge is dormant except for its explicit read-only version check and user-triggered self-test. CoBeing identity, sync, relationships and AI Agents are not in the public Preview yet. No private telemetry or event location accuracy beyond the data source is claimed.
+
+Source data can be delayed and must not be used for emergency planning. We do not use unofficial Flightradar24 scraping or distribute paid 3D imagery.
+
+## Open-source and data attribution
+
+- App: Apache-2.0 (this project).
+- Local Bridge: Apache-2.0 (https://github.com/eaopen/local-bridge).
+- Leaflet: BSD-2-Clause; map tiles and map data: © OpenStreetMap contributors, subject to public tile server policy.
+- Event data: USGS Earthquake Feeds and NASA EONET APIs.
+- Radio Browser is a station directory, not a WorldDesk rebroadcast server. Stations own their streams and licensing.
+- God’s Eye View is a separate upstream project; its source or licensed data are not copied into WorldDesk.

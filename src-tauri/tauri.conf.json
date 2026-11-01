@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "WorldDesk Preview",
+  "version": "0.1.0",
+  "identifier": "cc.cobeing.worlddesk.preview",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [{
+      "label": "main",
+      "title": "WorldDesk · 打开世界",
+      "width": 1410, "height": 880,
+      "minWidth": 960, "minHeight": 650,
+      "resizable": true,
+      "backgroundColor": "#081625"
+    }],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org; connect-src ipc: http://ipc.localhost https://earthquake.usgs.gov https://eonet.gsfc.nasa.gov https://de1.api.radio-browser.info https://nl1.api.radio-browser.info; media-src https: http:; font-src 'self' data:; object-src 'none'; frame-src 'none'; base-uri 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "externalBin": ["binaries/local-bridge"],
+    "category": "Entertainment",
+    "shortDescription": "Explore the real world with WorldDesk",
+    "longDescription": "WorldDesk explores public real-world events, live radio and discoveries, bundled with a local capability Bridge.",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.icns", "icons/icon.ico"]
+  }
+}

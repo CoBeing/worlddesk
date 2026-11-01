@@ -1,0 +1,12 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+# Compiled Local Bridge binaries must come from a pinned, built source.
+src-tauri/binaries/*
+!src-tauri/binaries/.gitkeep
