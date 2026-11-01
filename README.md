@@ -7,11 +7,14 @@ WorldDesk is an independent CoBeing ecosystem application. The CoBeing platform 
 ## Preview features — implemented
 
 - **世界盲盒**: a random sourced world event or radio station.
-- **地球观察**: real earthquake observations from USGS and natural events from NASA EONET on a Leaflet/OpenStreetMap map.
+- **地球观察**: real earthquake observations from USGS and natural events from NASA EONET on a local Natural Earth coastline map.
 - **听听世界**: try direct Internet radio streams from Radio Browser. Streams can be blocked or use unsupported codecs.
 - **收藏与分享**: favorites stored in this app locally, share official event and source links. No automatic cloud sync.
+- **中英双语**: follows the operating system language by default (Chinese/English), with a manual selector.
+- **IP 地区初始定位**: GeoJS best-effort coarse location, manual Chinese city fallback; no precise GPS permission or raw IP stored.
+- **中国友好体验**: Chinese radio catalog first, local sunrise, sunset and moon phases computed without paid API keys; bundled offline coastline map.
 - **Local Bridge included**: the desktop install carries the open-source eaopen/local-bridge runtime as a bundled sidecar. The app reads the actual bundled binary version, with an opt-in self-test. No separate installation, background service, model account or third-party communications permission is required.
-- **Optional CoBeing and 3D links**: links to CoBeing and God’s Eye View. Long-term memory, CoBeing login and the full 3D engine are not embedded in this Preview.
+- **Built-in astronomy and world observations**: internal sky calculations and world-event map; no dependency on CoBeing or God’s Eye View UI. CoBeing remains optional behind the scenes and is not connected in this Preview.
 
 ## Download
 
@@ -44,7 +47,7 @@ Source data can be delayed and must not be used for emergency planning. We do no
 
 - App: Apache-2.0 (this project).
 - Local Bridge: Apache-2.0 (https://github.com/eaopen/local-bridge).
-- Leaflet: BSD-2-Clause; map tiles and map data: © OpenStreetMap contributors, subject to public tile server policy.
+- Leaflet: BSD-2-Clause. Simplified coastline data: Natural Earth (public domain) via world-atlas/topojson-client; no external map tile CDN.
 - Event data: USGS Earthquake Feeds and NASA EONET APIs.
 - Radio Browser is a station directory, not a WorldDesk rebroadcast server. Stations own their streams and licensing.
 - God’s Eye View is a separate upstream project; its source or licensed data are not copied into WorldDesk.

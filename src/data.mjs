@@ -2,7 +2,8 @@
 export const FEEDS=Object.freeze({
  earthquakes:'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson',
  events:'https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=100',
- radio:'https://de1.api.radio-browser.info/json/stations/topvote/80?hidebroken=true'
+ radio:'https://de1.api.radio-browser.info/json/stations/topvote/80?hidebroken=true',
+ radioChina:'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/CN?hidebroken=true&order=votes&reverse=true&limit=80'
 })
 const finite=(v)=>typeof v==='number'&&Number.isFinite(v)
 export function httpsUrl(value){
@@ -54,11 +55,20 @@ export function normalizeRadios(raw){
  }).slice(0,80)
 }
 export function safeSnapshot(item){
- if(!item||!['quake','event','radio'].includes(item.kind)||typeof item.id!=='string')return null
+ if(!item||!['quake','event','radio','sky'].includes(item.kind)||typeof item.id!=='string')return null
  const x={id:item.id.slice(0,200),kind:item.kind,title:String(item.title||'').slice(0,250),
   subtitle:String(item.subtitle||'').slice(0,250),when:finite(item.when)?item.when:null,
   point:item.point?geoPoint([item.point[1],item.point[0]]):null,sourceUrl:httpsUrl(item.sourceUrl)}
  if(item.kind==='quake')x.magnitude=finite(item.magnitude)?item.magnitude:null
+ if(item.kind==='sky'){
+  x.titleKey=String(item.titleKey||'').slice(0,80)
+  x.subtitleKey=String(item.subtitleKey||'').slice(0,80)
+  x.skyType=String(item.skyType||'').slice(0,40)
+  x.locationName=String(item.locationName||'').slice(0,80)
+  x.tz=String(item.tz||'UTC').slice(0,80)
+  x.moonFraction=finite(item.moonFraction)?item.moonFraction:null
+  x.moonPhase=finite(item.moonPhase)?item.moonPhase:null
+ }
  if(item.kind==='event')x.category=String(item.category||'').slice(0,140)
  if(item.kind==='radio'){
   x.streamUrl=mediaUrl(item.streamUrl);x.country=String(item.country||'').slice(0,120)

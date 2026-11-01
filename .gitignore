@@ -10,3 +10,5 @@ src-tauri/gen/
 # Compiled Local Bridge binaries must come from a pinned, built source.
 src-tauri/binaries/*
 !src-tauri/binaries/.gitkeep
+
+release-assets/

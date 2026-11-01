@@ -2,13 +2,13 @@
 
 ## Official downloads
 
-Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. Verify the file SHA-256 against the release checksum asset.
+Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. For v0.1.0-preview.2, only macOS Apple Silicon is currently released; Windows and Linux are deferred until the Mac user experience is validated. Verify the file SHA-256 against the release checksum asset.
 
 | Platform | File | Procedure |
 |---|---|---|
-| macOS Apple Silicon or Intel | WorldDesk-Preview-macos-*.zip | Unzip and drag WorldDesk Preview.app into Applications |
-| Windows x64 | WorldDesk-Preview-windows-x64.exe | Run the NSIS installer and follow its UI |
-| Ubuntu/Debian x64 | WorldDesk-Preview-linux-x64.deb | Install with the system package manager |
+| macOS Apple Silicon (M1/M2/M3/M4) | WorldDesk-Preview-macos-arm64.zip | Unzip and drag WorldDesk Preview.app into Applications |
+| Windows x64 (later) | Not in v0.1.0-preview.2 | Return after native Mac acceptance |
+| Ubuntu/Debian x64 (later) | Not in v0.1.0-preview.2 | Return after native Mac acceptance |
 
 If a platform file is missing, that platform build has not been published or verified.
 
@@ -29,8 +29,16 @@ Local Bridge runs as a Tauri sidecar; it is an independently built binary, not a
 
 ## Internet and limitations
 
-USGS, NASA EONET, Radio Browser and OpenStreetMap data rely on the public Internet. Individual sources may fail, be stale or rate-limited; other available sources continue working. Offline previously saved cards are historical only. Direct radio streams vary by provider, codec and rights.
+USGS, NASA EONET and Radio Browser rely on the public Internet; the bundled coastline and sky calculations work offline. Individual sources may fail, be stale or rate-limited; other available sources continue working. Offline previously saved cards are historical only. Direct radio streams vary by provider, codec and rights.
 
-CoBeing Basic remains in active development; user logins, memory sync, multiplayer rooms and private Agent operations are not available yet. God’s Eye View is linked as a separate project, not packaged as a 3D engine.
+CoBeing Basic remains in active development; user logins, memory sync, multiplayer rooms and private Agent operations are not available yet. WorldDesk provides its own sky calculation and world-event visualization; there is no CoBeing or God’s Eye View connection in this Preview.
 
 No signing certificate or notarization is used for this release; future updates are installed manually.
+
+## Locale and IP location
+
+The app uses your operating system language (Chinese or English) by default. Changing the dropdown overrides the language; the IP country never overrides this preference. For a useful starting point, the app attempts coarse public-IP geolocation directly from the user device via GeoJS, with ipwho.is as a fallback. Both services can see the request IP; WorldDesk does not persist it. If they fail or you use a VPN, select a preferred city manually (including Beijing, Shanghai, Shenzhen, Chengdu, Hong Kong, Singapore and more). The choice stays on this device. No precise GPS permission is requested.
+
+## China-first content
+
+Chinese language radio stations are prioritized, followed by global streams. On-device sunrise, sunset and moon phase calculations work for the selected city without APIs. Live China-region events are shown only when the public source actually reports them; no invented local observations. Mainland-China map platform APIs often need licensed keys and appropriate service terms; this Preview avoids them with a simplified, non-navigational Natural Earth coastline map. Any future commercial map service must be authorized separately.

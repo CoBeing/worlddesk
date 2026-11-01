@@ -61,8 +61,7 @@ fn open_external(app: tauri::AppHandle, url: String) -> Result<(), String> {
     let host = parsed.host_str().unwrap_or("");
     let allowed = [
         "github.com", "earthquake.usgs.gov", "eonet.gsfc.nasa.gov",
-        "radio.garden", "www.radio-browser.info", "godseyeview.com",
-        "www.nasa.gov",
+        "www.radio-browser.info",
     ];
     if !allowed.contains(&host) {
         return Err("当前仅开放经过确认的官方探索入口".into());

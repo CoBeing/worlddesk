@@ -22,9 +22,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Mac-first validation. Windows/Linux remain supported by source/build scripts
+          # but are not published until native acceptance is complete.
           - {os: macos-15, label: macos, bundle: app}
-          - {os: windows-2022, label: windows, bundle: nsis}
-          - {os: ubuntu-24.04, label: linux, bundle: deb}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

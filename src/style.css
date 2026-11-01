@@ -137,3 +137,42 @@ button:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
  .hero-planet{right:-145px}
  .nav-button{padding:11px 8px}
 }
+
+/* China-first, offline map silhouette & locale/location header (no external tiles). */
+#world-map{background:radial-gradient(ellipse at 58% 42%,#153d53 0%,#0e2b3e 54%,#071a2b 100%);filter:none}
+.map-caption{letter-spacing:.05px;text-shadow:0 2px 8px #04111af2}
+.lang-select{display:flex;align-items:center;gap:5px;border:1px solid #26495a;background:#0d2839;border-radius:9px;padding:7px 8px;font-size:13px;color:#a4d7d7}
+.lang-select select{max-width:90px;background:transparent;border:0;color:#ccece6;font-size:11px;outline:0;cursor:pointer}
+.lang-select option{background:#102838;color:#e8f4ef}
+.location-strip{display:flex;align-items:center;gap:10px;min-height:52px;max-width:100%;border:1px solid #274652;background:#0d2532;border-radius:11px;margin:-12px 0 17px;padding:9px 15px;flex-wrap:wrap}
+.location-symbol{font-size:24px;color:#70e3c6;line-height:1}
+.location-label{font-size:11px;font-weight:650;color:#a3bcc6;white-space:nowrap}
+#location-label{font-size:11px;color:#e0fbf1;white-space:nowrap}
+#city-select{background:#153947;border:1px solid #34636d;border-radius:8px;padding:7px 10px;color:#d1f5ea;max-width:185px;font-size:11px;cursor:pointer}
+#city-select option{color:#e8f8ef;background:#112b38}
+#location-privacy{font-size:9px;color:#668c9b;flex:1;min-width:145px;text-align:right;line-height:1.35}
+.hero{height:245px}
+.hero-copy{padding-top:24px}
+.hero h2{font-size:28px;line-height:1.34;margin:12px 0}
+.hero p{max-width:390px}
+#page-sky{display:block}
+.feed-symbol.sky{background:#253f5d;color:#c6dfff}
+.detail-orb{background:radial-gradient(circle at 28% 25%,#7ce7d4,#277f96 48%,#0b244a 87%)}
+@media(max-width:1360px){
+ .location-strip{gap:6px}
+ #location-privacy{display:none}
+ #city-select{max-width:165px}
+}
+@media(max-width:1100px){
+ .top-actions{gap:7px}
+ .lang-select{padding:5px}
+ .hero{height:252px}
+ .location-strip{margin-top:-5px}
+}
+
+/* Bilingual labels are full-width text, never styled like nav icon glyphs. */
+.nav-button{gap:12px;min-height:44px;align-items:center}
+.nav-button>span:first-child{font-size:18px;flex:0 0 25px;text-align:center;width:25px}
+.nav-button>span[data-i18n]{font-size:12px;font-weight:600;text-align:left;min-width:0;width:auto;flex:1;line-height:1.55;overflow-wrap:normal;word-break:keep-all}
+.nav-button.active>span[data-i18n]{font-weight:750}
+@media(max-width:1200px){.nav-button>span[data-i18n]{font-size:11px}.nav-button{gap:8px}}
