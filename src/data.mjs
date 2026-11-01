@@ -55,10 +55,21 @@ export function normalizeRadios(raw){
  }).slice(0,80)
 }
 export function safeSnapshot(item){
- if(!item||!['quake','event','radio','sky'].includes(item.kind)||typeof item.id!=='string')return null
+ if(!item||!['quake','event','radio','sky','scene'].includes(item.kind)||typeof item.id!=='string')return null
  const x={id:item.id.slice(0,200),kind:item.kind,title:String(item.title||'').slice(0,250),
   subtitle:String(item.subtitle||'').slice(0,250),when:finite(item.when)?item.when:null,
   point:item.point?geoPoint([item.point[1],item.point[0]]):null,sourceUrl:httpsUrl(item.sourceUrl)}
+ if(item.kind==='scene'){
+  // Local curated assets or images served by NASA/JMA; never persist arbitrary file/network URLs.
+  const url=String(item.photoUrl||'')
+  const allowed=url.startsWith('/scenes/')&&/^\/scenes\/[a-z0-9-]+\.jpg$/.test(url)
+   ||/^https:\/\/(epic\.gsfc\.nasa\.gov|www\.data\.jma\.go\.jp)\//.test(url)
+  if(!allowed)return null
+  for(const key of ['titleZh','titleEn','descriptionZh','descriptionEn','category','dateLabel','frameDate','author','license']){
+   x[key]=String(item[key]||'').slice(0,key.startsWith('description')?500:160)
+  }
+  x.photoUrl=url
+ }
  if(item.kind==='quake')x.magnitude=finite(item.magnitude)?item.magnitude:null
  if(item.kind==='sky'){
   x.titleKey=String(item.titleKey||'').slice(0,80)

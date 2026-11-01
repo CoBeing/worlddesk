@@ -7,6 +7,8 @@ import {FEEDS,normalizeQuakes,normalizeEonet,normalizeRadios,safeSnapshot,httpsU
 import {pickLanguage,translator} from './locale.mjs'
 import {CITIES,cityById,locateByIp,haversineKm} from './location.mjs'
 import {skyObservations,formatAtLocation} from './sky.mjs'
+import {createCinema} from './cinema.mjs'
+import {FLIGHT_PROVIDER,FLIGHT_REGIONS,FLIGHT_RADIUS_NM,normalizeFlights,formatAltitude,aircraftDataAge} from './flights.mjs'
 
 const el=id=>document.getElementById(id)
 const LOCAL_LOCALE='worlddesk:language:v1'
@@ -20,24 +22,26 @@ const state={
  choice:preferred,
  cityOverride:readLocal(LOCAL_CITY)||'auto',
  location:null,ipLocation:null,
- quake:[],event:[],radio:[],sky:[],
- view:'all',selected:null,saved:new Map(),markers:new Map(),
- loading:false,errors:[],playerId:null,map:null,markerLayer:null,positionMarker:null
+ quake:[],event:[],radio:[],sky:[],flight:[],
+ view:'watch',selected:null,saved:new Map(),markers:new Map(),cinema:null,
+ loading:false,errors:[],playerId:null,map:null,markerLayer:null,positionMarker:null,
+ flightLoading:false,flightError:null,flightRegion:'current',followedHex:null,flightLastUpdate:null
 }
 let t=translator(state.lang)
 const translationKeys={
- all:'headAll',nearby:'headNearby',sky:'headSky',
+ watch:'headWatch',all:'headAll',flight:'headFlight',nearby:'headNearby',sky:'headSky',
  quake:'headQuake',event:'headEvent',radio:'headRadio',saved:'headSaved'
 }
-const kindNames={quake:'quakeKind',event:'eventKind',radio:'radioKind',sky:'skyKind'}
+const kindNames={quake:'quakeKind',event:'eventKind',radio:'radioKind',sky:'skyKind',scene:'sceneKind',flight:'flightKind'}
 function create(tag,text,className){
  const element=document.createElement(tag)
  if(text!==null&&text!==undefined)element.textContent=String(text)
  if(className)element.className=className
  return element
 }
-function titleOf(x){return x.titleKey?t(x.titleKey):String(x.title||'')}
+function titleOf(x){return x.kind==='scene'?(state.lang==='zh'?x.titleZh:x.titleEn)||x.title||'':x.titleKey?t(x.titleKey):String(x.title||'')}
 function subtitleOf(x){
+ if(x.kind==='scene')return (state.lang==='zh'?x.descriptionZh:x.descriptionEn)||x.subtitle||''
  if(x.kind==='sky'){
   const city=cityById(x.id.split(':').at(-1))
   const name=city?(state.lang==='zh'?city.zh:city.en):(x.locationName||'')
@@ -46,6 +50,7 @@ function subtitleOf(x){
  return x.subtitle||''
 }
 function displayTime(x){
+ if(x.kind==='scene')return x.frameDate||x.dateLabel||t('statusNoTime')
  if(!Number.isFinite(x.when))return t('statusNoTime')
  if(x.kind==='sky')return formatAtLocation(x.when,x.tz,state.lang)
  const options={month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}
@@ -69,11 +74,14 @@ function applyLanguage(){
  el('language-select').querySelector('option[value="auto"]').textContent=state.lang==='zh'?'跟随系统':'System'
  el('save').title=t(state.selected&&state.saved.has(state.selected.id)?'unfavorite':'favorite')
  el('refresh').title=t('refresh')
+ rebuildFlightSelect()
+ renderFlightStatus()
  rebuildCitySelect()
  updateLocationLabel()
+ if(state.cinema)state.cinema.updateLanguage(state.lang)
  renderItems()
  if(state.selected)showDetail(state.selected)
- const hasData=allAvailable().length
+ const hasData=state.view==='flight'?state.flight.length:allAvailable().length
  if(!state.loading)el('data-status').textContent=hasData?hasData+t('countSuffix'):t('noFeeds')
  else el('data-status').textContent=t('loadingWorld')
 }
@@ -133,9 +141,11 @@ async function initializeLocation(){
    tz:coarse.tz==='UTC'&&close?close.tz:coarse.tz
   }
   setLocation(state.ipLocation)
+  if(state.view==='flight'&&state.flightRegion==='current')void loadFlights()
  }else{
   const fallback=cityById('beijing')
   setLocation({...fallback,kind:'fallback',city:fallback.zh})
+  if(state.view==='flight'&&state.flightRegion==='current')void loadFlights()
  }
 }
 function setCity(value){
@@ -148,6 +158,7 @@ function setCity(value){
  }else{
   const city=cityById(state.cityOverride)
   setLocation({...city,kind:'manual',city:state.lang==='zh'?city.zh:city.en})
+  if(state.view==='flight'&&state.flightRegion==='current')void loadFlights()
   toast(t('citySaved'))
  }
 }
@@ -207,8 +218,18 @@ function viewItems(){
 }
 function renderMenu(){
  for(const btn of document.querySelectorAll('[data-view]'))btn.classList.toggle('active',btn.dataset.view===state.view)
+ const watching=state.view==='watch'
+ el('cinema').hidden=!watching
+ el('cinema-rail').hidden=!watching
+ el('flight-toolbar').hidden=state.view!=='flight'
+ document.querySelector('.section-line').hidden=watching
+ document.querySelector('.explore-grid').hidden=watching
+ document.querySelector('.source-note').hidden=watching
+ document.querySelector('.app-shell').classList.toggle('watch-active',watching)
  el('feed-title').textContent=t(translationKeys[state.view]||'headAll')
- el('results-label').textContent=t(state.view==='saved'?'feedSaved':'feedPublic')
+ el('results-label').textContent=state.view==='flight'?t('flightFeed'):t(state.view==='saved'?'feedSaved':'feedPublic')
+ if(state.view==='flight')el('data-status').textContent=state.flight.length?state.flight.length+t('countSuffix'):t('flightStatusLoading')
+ document.querySelector('.source-note').textContent=state.view==='flight'?t('flightSource')+' — '+t('flightInfo'):t('sourceNote')
 }
 function renderItems(){
  renderMenu()
@@ -216,20 +237,21 @@ function renderItems(){
  const values=viewItems()
  el('count').textContent=String(values.length)
  if(!values.length){
-  list.append(create('p',t(state.loading?'emptyLoading':state.view==='saved'?'emptySaved':'emptyFeed'),'empty'))
+  const empty=state.view==='flight'?state.flightLoading?'flightStatusLoading':state.flightError?'flightStatusError':'flightStatusEmpty':state.loading?'emptyLoading':state.view==='saved'?'emptySaved':'emptyFeed'
+  list.append(create('p',t(empty),'empty'))
   return
  }
  for(const item of values.slice(0,110)){
   const selected=state.selected?.id===item.id
   const row=create('button',null,'feed-item'+(selected?' selected':''))
   row.type='button'
-  const symbol=item.kind==='quake'?'◎':item.kind==='event'?'☼':item.kind==='radio'?'♫':'☾'
+  const symbol=item.kind==='quake'?'◎':item.kind==='event'?'☼':item.kind==='radio'?'♫':item.kind==='flight'?'✈':'☾'
   const badge=create('div',symbol,'feed-symbol '+item.kind)
   const body=create('div',null,'feed-body')
   body.append(
    create('div',titleOf(item),'item-heading'),
    create('div',subtitleOf(item),'item-description'),
-   create('div',item.kind==='radio'?t('statusAudio'):displayTime(item),'item-time')
+   create('div',item.kind==='radio'?t('statusAudio'):item.kind==='flight'?aircraftDataAge(item,state.lang):displayTime(item),'item-time')
   )
   row.append(badge,body,create('span','›','feed-chevron'))
   row.addEventListener('click',()=>selectItem(item,true))
@@ -242,6 +264,20 @@ function renderMarkers(){
   state.view==='sky'?state.sky:state.view==='nearby'?nearValues():
   state.view==='all'?[...state.sky,...state.event,...state.quake]:viewItems()
  for(const item of visible.filter(x=>x.point).slice(0,300)){
+  if(item.kind==='flight'){
+   const track=Number.isFinite(item.heading)?Math.round(item.heading):0
+   const marker=L.marker(item.point,{
+    icon:L.divIcon({
+     className:'aircraft-marker'+(state.followedHex===item.hex?' following':''),
+     html:'<span style="transform:rotate('+track+'deg)">✈</span>',
+     iconSize:[29,29],iconAnchor:[14,14]
+    })
+   }).addTo(markers)
+   marker.bindTooltip(item.title+' · '+formatAltitude(item.altitudeFt,state.lang),{direction:'top',opacity:.95})
+   marker.on('click',()=>selectItem(item,true))
+   state.markers.set(item.id,marker)
+   continue
+  }
   const color=item.kind==='quake'?'#ffae79':item.kind==='sky'?'#c3e2ff':'#67efbb'
   const marker=L.circleMarker(item.point,{radius:item.kind==='sky'?4.5:5.5,
    color,fillColor:color,weight:1.5,fillOpacity:.74}).addTo(markers)
@@ -258,7 +294,12 @@ function showDetail(item){
  el('detail-sub').textContent=subtitleOf(item)
  el('save').textContent=state.saved.has(item.id)?'♥':'♡'
  el('save').title=t(state.saved.has(item.id)?'unfavorite':'favorite')
- const rows=[
+ const rows=item.kind==='scene'?[
+  [t('sceneTime'),displayTime(item)],
+  [t('sceneCredit'),item.author||''],
+  [t('sceneLicense'),item.license||''],
+  [t('sceneCategory'),t(item.category==='china'?'sceneChina':item.category==='earth'?'sceneEarth':'sceneClouds')]
+ ]:[
   [t('sourceLabel'),item.kind==='quake'?'USGS':item.kind==='event'?'NASA EONET':item.kind==='radio'?'Radio Browser':t('computedLabel')],
   [t('timeLabel'),item.kind==='radio'?t('statusAudio'):displayTime(item)]
  ]
@@ -268,6 +309,23 @@ function showDetail(item){
  }
  if(item.point)rows.push([t('positionLabel'),item.point[0].toFixed(2)+'°, '+item.point[1].toFixed(2)+'°'])
  if(item.kind==='radio')rows.push([t('areaLabel'),item.country||t('statusUnknown')])
+ if(item.kind==='flight'){
+  rows.length=0
+  rows.push(
+   [t('flightCallsign'),item.callsign||item.hex.toUpperCase()],
+   [t('flightRegistration'),item.registration||t('statusUnknown')],
+   [t('flightType'),item.aircraftType||t('statusUnknown')],
+   [t('flightAltitude'),formatAltitude(item.altitudeFt,state.lang)],
+   [t('flightSpeed'),Number.isFinite(item.speedKmh)?item.speedKmh+' km/h':t('statusUnknown')],
+   [t('flightHeading'),Number.isFinite(item.heading)?Math.round(item.heading)+'°':t('statusUnknown')],
+   [t('flightAge'),aircraftDataAge(item,state.lang)],
+   [t('sourceLabel'),'adsb.lol · ODbL 1.0']
+  )
+ }
+ el('save').hidden=item.kind==='flight'
+ el('flight-follow').hidden=item.kind!=='flight'
+ el('flight-warning').hidden=item.kind!=='flight'
+ if(item.kind==='flight')el('flight-follow').textContent=t(state.followedHex===item.hex?'flightUnfollow':'flightFollow')
  const box=el('detail-data');box.replaceChildren()
  for(const [a,b] of rows){
   const row=create('div',null,'detail-row')
@@ -288,16 +346,152 @@ function showDetail(item){
  }else{el('player').pause();player.hidden=true}
 }
 function selectItem(item,fly=true){
+ if(item.kind==='scene'&&state.cinema){
+  if(state.view!=='watch')changeView('watch')
+  state.cinema.selectId(item.id)
+  return
+ }
  state.selected=item
  showDetail(item)
- if(fly&&item.point)map.flyTo(item.point,Math.max(map.getZoom(),4),{duration:.8})
- state.markers.get(item.id)?.bringToFront()
+ if(fly&&item.point)map.flyTo(item.point,Math.max(map.getZoom(),item.kind==='flight'?7:4),{duration:.8})
+ const selectedMarker=state.markers.get(item.id)
+ if(typeof selectedMarker?.bringToFront==='function')selectedMarker.bringToFront()
+ else if(typeof selectedMarker?.setZIndexOffset==='function')selectedMarker.setZIndexOffset(1000)
  renderItems()
 }
 function changeView(view){
+ const previouslyWatching=state.view==='watch'
+ if(previouslyWatching&&view!=='watch')state.cinema?.stop()
  state.view=view;renderItems();renderMarkers()
+ if(view!=='watch')requestAnimationFrame(()=>map.invalidateSize())
+ if(view==='flight'){
+  const center=currentFlightCenter()
+  if(center)map.setView([center.lat,center.lon],6,{animate:false})
+  if(state.flight.length){
+   state.selected=state.flight[0]
+   showDetail(state.selected)
+  }else showFlightPlaceholder()
+  if(!state.flight.length)void loadFlights()
+ }
+ if(view==='watch'&&state.cinema){
+  state.selected={...state.cinema.selected(),title:state.cinema.selected().titleZh}
+  showDetail(state.selected)
+ }
  if(view==='radio')toast(t('radioMapNote'))
  else if(view==='nearby')toast(t('nearbyTip'))
+}
+function rebuildFlightSelect(){
+ const select=el('flight-area')
+ const desired=state.flightRegion
+ select.replaceChildren()
+ for(const region of FLIGHT_REGIONS){
+  select.append(new Option(state.lang==='zh'?region.zh:region.en,region.id))
+ }
+ select.value=desired
+}
+function currentFlightCenter(){
+ if(state.flightRegion==='current'){
+  if(state.location&&Number.isFinite(state.location.lat)&&Number.isFinite(state.location.lon)){
+   return state.location
+  }
+  return cityById('shanghai')
+ }
+ return FLIGHT_REGIONS.find(x=>x.id===state.flightRegion)||cityById('shanghai')
+}
+function renderFlightStatus(){
+ const status=el('flight-status')
+ if(state.flightLoading){status.textContent=t('flightStatusLoading');return}
+ if(state.flightError){status.textContent=t(state.flightError);return}
+ if(state.flightLastUpdate){
+  const time=new Intl.DateTimeFormat(state.lang==='zh'?'zh-CN':'en-US',{
+   hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  }).format(new Date(state.flightLastUpdate))
+  status.textContent=state.flight.length+' · '+time+' · '+t('flightFeed')
+  return
+ }
+ status.textContent=t('flightAwait')
+}
+function showFlightPlaceholder(){
+ el('detail-tag').textContent=t('flightKind')
+ el('detail-title').textContent=t('flightAwait')
+ el('detail-sub').textContent=t('flightStatusEmpty')
+ el('detail-data').replaceChildren()
+ el('save').hidden=true
+ el('source').hidden=true
+ el('flight-follow').hidden=true
+ el('flight-warning').hidden=false
+ el('radio-player').hidden=true
+}
+async function fetchFlightData(center){
+ if(native){
+  const {invoke}=await import('@tauri-apps/api/core')
+  return await invoke('flight_snapshot',{
+   lat:center.lat,lon:center.lon,dist:FLIGHT_RADIUS_NM
+  })
+ }
+ // Development server only: a narrow proxy for browser UI and screenshot tests.
+ // Production web builds cannot directly use the ADSB.lol endpoint (no CORS);
+ // the signed/unsigned desktop client is the supported interface.
+ if(import.meta.env.DEV){
+  return await getJSON('/flight-preview/v2/lat/'+center.lat.toFixed(4)+'/lon/'+center.lon.toFixed(4)+'/dist/'+FLIGHT_RADIUS_NM,10000)
+ }
+ throw new Error('desktop-only')
+}
+let flightRequestSerial=0
+async function loadFlights(){
+ if(state.flightLoading)return
+ const center=currentFlightCenter()
+ if(!center)return
+ const serial=++flightRequestSerial
+ const requestedRegion=state.flightRegion
+ state.flightLoading=true
+ state.flightError=null
+ el('flight-refresh').disabled=true
+ renderFlightStatus()
+ if(state.view==='flight')renderItems()
+ try{
+  const raw=await fetchFlightData(center)
+  if(serial!==flightRequestSerial||requestedRegion!==state.flightRegion)return
+  const firstLoaded=!state.flightLastUpdate
+  state.flight=normalizeFlights(raw)
+  state.flightLastUpdate=Date.now()
+  if(state.view==='flight'&&firstLoaded&&state.flight.length>1&&!state.followedHex){
+   const bounds=L.latLngBounds(state.flight.map(item=>item.point))
+   if(bounds.isValid())map.fitBounds(bounds.pad(.14),{maxZoom:6,animate:false})
+  }
+  if(state.followedHex){
+   const tracked=state.flight.find(a=>a.hex===state.followedHex)
+   if(tracked){
+    state.selected=tracked
+    if(state.view==='flight')map.setView(tracked.point,Math.max(map.getZoom(),7))
+   }else{
+    state.followedHex=null
+   }
+  }
+  if(state.view==='flight'){
+   if(state.selected?.kind==='flight'){
+    state.selected=state.flight.find(f=>f.hex===state.selected.hex)||state.flight[0]||null
+   }else state.selected=state.flight[0]||null
+  }
+  if(state.view==='flight'){
+   if(state.selected?.kind==='flight')showDetail(state.selected)
+   else showFlightPlaceholder()
+  }
+ }catch(e){
+  state.flight=[]
+  state.flightError=native||import.meta.env.DEV?'flightStatusError':'flightStatusDesktop'
+  if(state.view==='flight')showFlightPlaceholder()
+ }finally{
+  if(serial===flightRequestSerial){
+   state.flightLoading=false
+   el('flight-refresh').disabled=false
+   renderFlightStatus()
+   if(state.view==='flight'){
+    el('data-status').textContent=state.flight.length?state.flight.length+t('countSuffix'):t(state.flightError||'flightStatusEmpty')
+    renderItems();renderMarkers()
+   }
+  }
+ }
 }
 async function getJSON(url,timeout=11000){
  const controller=new AbortController()
@@ -401,13 +595,27 @@ function persistFavorites(){writeLocal(LOCAL_SAVED,JSON.stringify([...state.save
 export function mountWorldDesk(){
  initializeMap()
  loadFavorites()
+ state.cinema=createCinema({lang:state.lang,onToast:toast,onScene:scene=>{
+  if(state.view==='watch'){
+   state.selected=scene
+   showDetail(scene)
+  }
+ }})
+ window.addEventListener('worlddesk:source',event=>{
+  if(event.detail?.url)void openKnown(event.detail.url)
+ })
  el('language-select').value=state.choice
  el('language-select').addEventListener('change',e=>{setLanguage(e.target.value);tick()})
  el('city-select').addEventListener('change',e=>setCity(e.target.value))
  for(const b of document.querySelectorAll('[data-view]'))
   b.addEventListener('click',()=>changeView(b.dataset.view))
- el('refresh').addEventListener('click',()=>void loadWorld())
+ el('refresh').addEventListener('click',()=>{
+  if(state.view==='watch'){void state.cinema?.refreshEarth();state.cinema?.refreshClouds()}
+  if(state.view==='flight')void loadFlights()
+  else void loadWorld()
+ })
  el('surprise').addEventListener('click',()=>{
+  if(state.view==='watch'){state.cinema?.next();return}
   const values=allAvailable()
   if(!values.length){toast(t('surpriseWait'));return}
   const selected=values[Math.floor(Math.random()*values.length)]
@@ -417,6 +625,7 @@ export function mountWorldDesk(){
  })
  el('save').addEventListener('click',()=>{
   const item=state.selected;if(!item){toast(t('selectFirst'));return}
+  if(item.kind==='flight'){toast(t('flightInfo'));return}
   if(state.saved.has(item.id)){state.saved.delete(item.id);toast(t('unsaved'))}
   else{state.saved.set(item.id,safeSnapshot(item));toast(t('saved'))}
   persistFavorites();showDetail(item)
@@ -425,7 +634,7 @@ export function mountWorldDesk(){
  el('share').addEventListener('click',async()=>{
   const item=state.selected;if(!item){toast(t('selectFirst'));return}
   const title='WorldDesk · '+titleOf(item)
-  const description=subtitleOf(item)+' · '+displayTime(item)
+  const description=subtitleOf(item)+' · '+displayTime(item)+(item.kind==='scene'?' · '+item.author+' · '+item.license:'')
   const payload={title,text:description}
   if(item.sourceUrl)payload.url=item.sourceUrl
   try{
@@ -437,9 +646,30 @@ export function mountWorldDesk(){
   }catch(error){if(error?.name!=='AbortError')toast(t('shareFail'))}
  })
  el('source').addEventListener('click',()=>{if(state.selected?.sourceUrl)void openKnown(state.selected.sourceUrl)})
+ el('flight-follow').addEventListener('click',()=>{
+  if(state.selected?.kind!=='flight')return
+  state.followedHex=state.followedHex===state.selected.hex?null:state.selected.hex
+  showDetail(state.selected);renderMarkers()
+  if(state.followedHex)map.setView(state.selected.point,8,{animate:true})
+ })
+ el('flight-area').addEventListener('change',event=>{
+  state.flightRegion=event.target.value
+  flightRequestSerial++
+  state.flightLoading=false
+  state.flight=[];state.followedHex=null
+  state.flightLastUpdate=null
+  state.flightError=null
+  const center=currentFlightCenter()
+  if(center)map.setView([center.lat,center.lon],6,{animate:false})
+  void loadFlights()
+ })
+ el('flight-refresh').addEventListener('click',()=>void loadFlights())
  el('bridge-check').addEventListener('click',()=>void checkBridge())
  applyLanguage();tick()
  setInterval(tick,30000)
+ setInterval(()=>{
+  if(state.view==='flight'&&!document.hidden&&!state.flightLoading)void loadFlights()
+ },60000)
  setInterval(()=>{if(state.location){updateSky();if(state.view==='sky'||state.view==='nearby')renderItems()}},900000)
  void probeBridge()
  void initializeLocation()

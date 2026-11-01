@@ -176,3 +176,156 @@ button:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
 .nav-button>span[data-i18n]{font-size:12px;font-weight:600;text-align:left;min-width:0;width:auto;flex:1;line-height:1.55;overflow-wrap:normal;word-break:keep-all}
 .nav-button.active>span[data-i18n]{font-weight:750}
 @media(max-width:1200px){.nav-button>span[data-i18n]{font-size:11px}.nav-button{gap:8px}}
+
+/* WorldDesk Cinema — actual licensed imagery is the experience, not a decoration. */
+.cinema{
+  width:100%;height:496px;min-height:450px;overflow:hidden;position:relative;
+  background:radial-gradient(ellipse at 50% 44%,#133849,#020b15 70%);
+  border-radius:16px;border:1px solid #2f5359;
+  box-shadow:0 15px 50px #0005;
+}
+.cinema-image{
+  width:100%;height:100%;position:absolute;inset:0;display:block;object-fit:cover;
+  filter:saturate(1.02) contrast(1.05);background:#081521;
+  transition:opacity .22s;
+}
+.cinema[data-category="earth"] .cinema-image,
+.cinema[data-category="clouds"] .cinema-image{
+  object-fit:contain;background:#030b16;filter:none;
+}
+.cinema-gradient{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(2,15,25,.57) 0%,rgba(2,15,25,.0) 27%,
+    rgba(2,10,17,.0) 47%,rgba(2,10,18,.50) 65%,rgba(2,12,18,.95) 100%);
+}
+.cinema-top{
+  position:absolute;left:27px;right:27px;top:25px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.cinema-category,.cinema-time{
+  color:#e3faf6;font-weight:650;font-size:10px;line-height:1.5;
+  padding:7px 10px;border-radius:7px;
+  background:rgba(6,26,35,.68);border:1px solid #ffffff30;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.cinema-time{color:#e3e5e9;font-variant-numeric:tabular-nums;max-width:43%;text-align:right}
+.cinema-bottom{
+  position:absolute;bottom:0;left:0;right:0;padding:45px 28px 18px;
+  color:#fff;
+}
+.cinema-brow{font-size:9px;letter-spacing:1.6px;color:#88f1c9;font-weight:800}
+.cinema-copy{max-width:610px}
+.cinema h2{
+  font-size:30px;line-height:1.25;letter-spacing:-.7px;
+  font-weight:750;margin:10px 0 9px;color:#fff;
+  text-shadow:0 2px 8px #05121d8a;
+}
+.cinema p{
+  max-width:570px;color:#e3f0f1;font-size:12px;line-height:1.75;margin:0;
+  text-shadow:0 2px 6px #06121db3;
+}
+.cinema-controls{display:flex;gap:8px;align-items:center;margin:16px 0 17px;flex-wrap:wrap}
+.cinema-control,.cinema-play,.cinema-surprise{
+  min-height:34px;padding:5px 14px;background:rgba(8,35,44,.78);
+  color:#edfffc;border:1px solid #9be7cd6b;border-radius:8px;
+  font-size:12px;font-weight:700;
+}
+.cinema-control{font-size:26px;line-height:1;min-width:40px;padding:2px 8px}
+.cinema-play{background:#70e3bd;color:#053628;border-color:#70e3bd;padding:7px 15px}
+.cinema-surprise{font-size:17px}
+.cinema-control:hover,.cinema-surprise:hover{background:#2f6570}
+.cinema-play:hover{background:#a0ffde}
+.cinema-meta{
+  display:flex;gap:12px;align-items:center;justify-content:space-between;
+  border-top:1px solid #edf9f032;padding-top:12px;flex-wrap:wrap;
+}
+#cinema-credit{color:#c9dadb;font-size:9px;line-height:1.5;min-width:135px;max-width:45%}
+.cinema-frame-controls{display:flex;gap:6px}
+.cinema-frame-controls button,.cinema-original{
+  color:#a9e3d7;background:#14313bc7;border:1px solid #7fbfa75a;
+  border-radius:7px;padding:6px 9px;font-size:9px;
+}
+.cinema-frame-controls button:hover,.cinema-original:hover{background:#1d515a}
+.cinema-rail{
+  display:flex;gap:11px;overflow-x:auto;scroll-snap-type:x proximity;
+  scrollbar-width:thin;scrollbar-color:#44626c transparent;
+  padding:14px 1px 8px;
+}
+.film-thumb{
+  display:flex;flex-direction:column;gap:7px;position:relative;
+  flex:0 0 144px;min-width:144px;
+  color:#8faebd;text-align:left;border:1px solid transparent;border-radius:10px;
+  padding:5px;background:transparent;scroll-snap-align:start;
+}
+.film-thumb img{
+  width:132px;height:74px;object-fit:cover;border:1px solid #345260;border-radius:7px;
+}
+.film-thumb span{font-size:10px;line-height:1.45;padding:0 3px 2px;display:block}
+.film-thumb.selected{border-color:#51d5af;background:#16333b;color:#e1fff2}
+.film-thumb:hover:not(.selected){background:#122d3b;color:#e2ebec}
+.app-shell.watch-active .detail-illustration{height:118px;margin:22px 0 14px}
+.app-shell.watch-active #detail-title{font-size:20px}
+.app-shell.watch-active .detail-sub{max-height:130px;overflow-y:auto}
+.app-shell.watch-active .content{padding-bottom:12px}
+.app-shell.watch-active .section-line,
+.app-shell.watch-active .explore-grid,
+.app-shell.watch-active .source-note{display:none}
+@media(max-width:1250px){
+ .cinema{height:470px}
+ .cinema h2{font-size:25px}
+ .cinema-bottom{padding:38px 17px 13px}
+ .cinema-category,.cinema-time{font-size:9px}
+ .cinema-top{left:18px;right:18px;top:18px}
+ .cinema p{font-size:11px}
+ .film-thumb{flex-basis:125px;min-width:125px}
+ .film-thumb img{width:113px;height:65px}
+}
+@media(max-width:1050px){
+ .cinema{height:470px}
+ .cinema h2{font-size:22px}
+ .cinema-meta{gap:5px}
+ .cinema-time{max-width:46%}
+}
+
+/* Flight Watch. Real ADS-B positions, no simulated or inferred routes. */
+.flight-toolbar{
+  width:100%;display:flex;align-items:center;flex-wrap:wrap;gap:9px;
+  background:#102d3a;border:1px solid #325a63;
+  border-radius:11px;padding:10px 12px;margin:0 0 14px;
+  min-height:53px;
+}
+.flight-toolbar label{
+  font-size:11px;font-weight:700;color:#a2e6d7;
+}
+.flight-toolbar select{
+  padding:8px 10px;border:1px solid #376975;background:#102c3e;
+  border-radius:7px;color:#e2f7f0;font-size:11px;max-width:190px;
+}
+.flight-refresh{
+  border:1px solid #397c73;border-radius:8px;color:#c4fce9;
+  background:#1a4c4c;padding:9px 11px;font-size:11px;
+}
+.flight-refresh:hover{background:#235d5e}
+.flight-status{font-size:10px;color:#84b6c0;margin-left:auto;line-height:1.6;max-width:280px}
+.flight-warning{
+  font-size:10px;line-height:1.7;color:#91b7c3;
+  background:#172e3c;border:1px solid #2b5660;
+  padding:10px;border-radius:9px;
+}
+.feed-symbol.flight{background:#224e56;color:#8ff8da}
+.aircraft-marker{width:29px;height:29px;display:grid;place-items:center}
+.aircraft-marker span{
+  display:grid;place-items:center;width:27px;height:27px;
+  border-radius:50%;border:1px solid #8cedce;
+  background:rgba(14,70,76,.88);font-size:19px;
+  color:#d7fff2;text-shadow:0 0 8px #58f0bd;
+  box-shadow:0 2px 8px rgba(0,0,0,.36);line-height:1;
+}
+.aircraft-marker.following span{
+  border-color:#fff2a3;background:#466350;color:#fff0a4;
+  box-shadow:0 0 14px #e7d26e85;
+}
+@media(max-width:1220px){
+ .flight-toolbar{gap:6px}
+ .flight-status{max-width:190px}
+}

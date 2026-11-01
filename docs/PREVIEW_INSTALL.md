@@ -2,7 +2,7 @@
 
 ## Official downloads
 
-Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. For v0.1.0-preview.2, only macOS Apple Silicon is currently released; Windows and Linux are deferred until the Mac user experience is validated. Verify the file SHA-256 against the release checksum asset.
+Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. For v0.1.0-preview.3, only macOS Apple Silicon is currently released; Windows and Linux are deferred until the Mac user experience is validated. Verify the file SHA-256 against the release checksum asset.
 
 | Platform | File | Procedure |
 |---|---|---|
@@ -42,3 +42,10 @@ The app uses your operating system language (Chinese or English) by default. Cha
 ## China-first content
 
 Chinese language radio stations are prioritized, followed by global streams. On-device sunrise, sunset and moon phase calculations work for the selected city without APIs. Live China-region events are shown only when the public source actually reports them; no invented local observations. Mainland-China map platform APIs often need licensed keys and appropriate service terms; this Preview avoids them with a simplified, non-navigational Natural Earth coastline map. Any future commercial map service must be authorized separately.
+
+
+## New: real World Cinema and Flight Watch
+
+The home view opens with licensed real photographs, NASA DSCOVR EPIC Earth images, and JMA Himawari infrared cloud observations. Use Previous / Next and Keep Exploring to navigate. Captions show source, author, license, and observation/photo date; these are not live cameras. Satellite frames are delayed or unavailable at times. See docs/MEDIA_CREDITS.md.
+
+Flight Watch shows openly received aircraft ADS-B positions (adsb.lol ODbL 1.0), not FR24. Choose a current or preset airspace: Shanghai, Beijing, Pearl River Delta, Hong Kong, Tokyo, Singapore, or London. Click a plane to see reported aircraft type, altitude, speed, heading, and position age; toggle Follow to recenter after subsequent reports. Only reported coordinates are shown, with no inferred origin or destination. Refreshing happens while the view is active (about once per minute), not as a background aircraft monitor. The third-party source sees the chosen geographic center and the requesting IP. The development browser has a local test proxy; the installed Mac app uses a fixed native HTTPS request. See docs/FLIGHT_DATA.md.

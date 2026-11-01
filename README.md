@@ -6,7 +6,8 @@ WorldDesk is an independent CoBeing ecosystem application. The CoBeing platform 
 
 ## Preview features — implemented
 
-- **世界盲盒**: a random sourced world event or radio station.
+- **随便看看 · World Cinema**: six genuinely sourced, watchable scenes including Yangshuo, Zhangjiajie, the Great Wall, Sichuan highlands, NASA DSCOVR EPIC Earth imagery, and JMA Himawari infrared cloud observations with capture dates, credits, and playback/step controls. Photos are archives; satellite images are delayed observations, not live webcams.
+- **航班追踪 · Flight Watch**: real open ADS-B aircraft snapshots for selected China and world airspace regions, with callsign, aircraft type, registration, reported altitude, ground speed, heading, location age, and follow mode. On desktop only; fetched on entering the view and about every 60 seconds while visible. Source is adsb.lol ODbL 1.0, not FR24 data.
 - **地球观察**: real earthquake observations from USGS and natural events from NASA EONET on a local Natural Earth coastline map.
 - **听听世界**: try direct Internet radio streams from Radio Browser. Streams can be blocked or use unsupported codecs.
 - **收藏与分享**: favorites stored in this app locally, share official event and source links. No automatic cloud sync.
@@ -41,7 +42,7 @@ Use npm run dev for a browser-only preview with no native privileges, and npm te
 
 WorldDesk requests only public, read-only feeds; it does not automatically read user messages, files, microphones or SDR devices. Local Bridge is dormant except for its explicit read-only version check and user-triggered self-test. CoBeing identity, sync, relationships and AI Agents are not in the public Preview yet. No private telemetry or event location accuracy beyond the data source is claimed.
 
-Source data can be delayed and must not be used for emergency planning. We do not use unofficial Flightradar24 scraping or distribute paid 3D imagery.
+Source observations can be delayed and must not be used for emergency, aviation or route planning. Open ADS-B has patchy coverage (especially in China), is not a substitute for FR24 or ATC information, and never supplies invented route endpoints. We do not use unofficial Flightradar24 scraping or distribute paid 3D imagery.
 
 ## Open-source and data attribution
 
@@ -51,3 +52,10 @@ Source data can be delayed and must not be used for emergency planning. We do no
 - Event data: USGS Earthquake Feeds and NASA EONET APIs.
 - Radio Browser is a station directory, not a WorldDesk rebroadcast server. Stations own their streams and licensing.
 - God’s Eye View is a separate upstream project; its source or licensed data are not copied into WorldDesk.
+
+
+## Flight data, media and content credits
+
+- Flight data and licensing: see docs/FLIGHT_DATA.md. The open API (ODbL 1.0) is from adsb.lol. This public preview is exploratory; contact the source maintainer before broad production rollout. FR24's consumer website prohibits automated data collection; its official API is separately licensed.
+- Imagery and credits: see docs/MEDIA_CREDITS.md. Archive photos and satellite observations retain their own licenses and attribution requirements. They are not part of the WorldDesk Apache-2.0 grant.
+- Experience roadmap: docs/CAPABILITY_ROADMAP.md. Candidate next features include ISS passes, sunlit Earth, properly licensed public cameras and stories.
