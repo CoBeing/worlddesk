@@ -1,0 +1,54 @@
+name: Windows installer smoke
+on:
+  push:
+    branches: [dev]
+    paths: ['.github/workflows/windows-install-smoke.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download matching release installer
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $tag = "v$version"
+          New-Item -ItemType Directory -Force release-assets | Out-Null
+          for ($attempt = 0; $attempt -lt 40; $attempt++) {
+            gh release download $tag --dir release-assets --pattern '*windows*' --clobber
+            if ($LASTEXITCODE -eq 0 -and (Test-Path release-assets/SHA256-windows-x64.txt)) { break }
+            Start-Sleep -Seconds 15
+          }
+          if (!(Test-Path release-assets/SHA256-windows-x64.txt)) { throw 'Windows release assets not available' }
+          Get-Content release-assets/SHA256-windows-x64.txt | ForEach-Object {
+            $parts = $_ -split '  ', 2
+            $actual = (Get-FileHash (Join-Path release-assets $parts[1]) -Algorithm SHA256).Hash.ToLower()
+            if ($actual -ne $parts[0]) { throw "Checksum mismatch: $($parts[1])" }
+          }
+      - name: Install and launch desktop app
+        shell: pwsh
+        run: |
+          $installDir = Join-Path $env:RUNNER_TEMP 'WorldDeskSmoke'
+          $installer = (Resolve-Path release-assets/WorldDesk-Preview-windows-x64.exe).Path
+          $result = Start-Process $installer -ArgumentList '/S', "/D=$installDir" -Wait -PassThru
+          if ($result.ExitCode -ne 0) { throw "Installer exited $($result.ExitCode)" }
+          $app = Join-Path $installDir 'worlddesk.exe'
+          if (!(Test-Path $app)) { Get-ChildItem $installDir -Recurse; throw 'Application executable missing' }
+          $bridge = Join-Path $installDir 'local-bridge.exe'
+          & $bridge --version
+          if ($LASTEXITCODE -ne 0) { throw 'Bundled bridge failed' }
+          $process = Start-Process $app -PassThru
+          try {
+            Start-Sleep -Seconds 15
+            $process.Refresh()
+            if ($process.HasExited) { throw "Application exited early: $($process.ExitCode)" }
+            Write-Output 'PASS: Windows installation, bundled bridge, and application launch'
+          } finally {
+            if (!$process.HasExited) { Stop-Process -Id $process.Id }
+          }
