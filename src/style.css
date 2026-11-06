@@ -556,3 +556,38 @@ button:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
 .seasonal-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.seasonal-lunar,.seasonal-phenology{font-size:17px;font-weight:500;margin:12px 0}.seasonal-term{font-size:13px;color:#c8e2b4}.seasonal-note{font-size:12px;line-height:1.9}
 .seasonal-copy{display:flex;gap:12px;align-items:center;margin-top:14px}.seasonal-status{font-size:11px;color:#c8e2b4}.seasonal-manual{display:block;margin-top:12px;font-size:12px}.seasonal-manual textarea{width:100%;display:block;margin-top:8px;background:#091e26;color:#dce9df;border:1px solid #40615a;border-radius:5px;padding:12px;font:12px/1.7 monospace}
 @media(max-width:1100px){.seasonal-columns{grid-template-columns:1fr;gap:0}.seasonal-summary{display:block;margin-left:12px}}
+
+.bridge-card>summary{cursor:pointer;color:#aec6bc;font-size:12px;padding:6px 0}
+.bridge-card[open]>summary{margin-bottom:12px}
+.empty-action{margin:0 16px 16px}
+#radio-status{color:#ffc498;font-size:12px;line-height:1.6}
+button:focus-visible,summary:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
+
+.sky-visuals{margin:0 0 20px;color:#dbe8ee}.sky-visuals h2{font-size:22px;font-weight:550}.sky-visual-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sky-visual-card{padding:14px;background:#112a39;border:1px solid #345565;border-radius:14px;color:#e7ecdf;text-align:left;cursor:pointer}.sky-visual-card strong,.sky-visual-card span{display:block;margin-top:8px}.sky-visual-card span{color:#b3c8d3;font-size:12px}.sky-picture{height:120px}.sky-picture svg{width:100%;height:100%}.sky-relation{margin-top:18px;padding:18px;background:#102432;border:1px solid #345565;border-radius:14px}.sky-relation summary{cursor:pointer;font-size:16px}.sky-relation-body{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:center}.sky-relation-body svg{width:100%;max-height:250px}.sky-relation-body p,.sky-note{color:#aabfc9;font-size:12px;line-height:1.8}.phase-preview{width:84px;float:right}.moon-phase-choices{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;margin:16px 0}.moon-phase-choices button{background:#162e3e;border:1px solid transparent;border-radius:8px;padding:5px;color:#cbd9df;font-size:11px;cursor:pointer}.moon-phase-choices button[aria-pressed=true]{border-color:#70e4c1}.moon-phase-choices svg{width:100%;height:55px}.moon-phase-choices span{display:block}.flight-route{border-top:1px solid #345565;padding:14px 0;font-size:12px;line-height:1.6;color:#bcd2da}.flight-route strong{color:#80e3c6}.flight-route small{color:#a9b9c6}.seasonal-festivals{color:#edcd90}.seasonal-holidayNote{color:#99b7ab}
+@media(max-width:1180px){.sky-relation-body{grid-template-columns:1fr}.moon-phase-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.sky-visual-cards{gap:6px}.sky-visual-card{padding:8px}.flight-active .flight-toolbar select{max-width:125px}}
+
+.flight-active .flight-highlights{top:12px;left:12px;right:12px}
+
+/* Playful exploration: actions and journey first, details on demand. */
+.flight-play-actions{display:flex;gap:6px;flex-wrap:wrap;flex-basis:100%;padding-bottom:5px}
+.flight-play-actions button{border:1px solid #437c79;background:#173e42;color:#dbf5eb;border-radius:20px;padding:8px 14px;font-size:12px;cursor:pointer}
+.flight-play-actions button:hover{background:#275b58;border-color:#76e4be}
+.flight-play-actions button:active{transform:scale(.97)}
+.flight-active .flight-highlights{display:none!important}
+.flight-active .feed-pane{top:12px}
+.flight-active .inspector{top:190px;max-height:calc(100vh - 205px)}
+.flight-active .detail-illustration,.flight-active #detail-sub,.flight-active #flight-warning{display:none}
+.journey-eyebrow{display:block;color:#90b7bd;letter-spacing:.06em}
+.journey-endpoints{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0}
+.journey-endpoints>div{flex:1;min-width:0}.journey-endpoints>div:last-child{text-align:right}
+.journey-endpoints strong{font-size:30px;display:block;color:#f5e5be;font-weight:650}
+.journey-endpoints span:not(.journey-plane){display:block;color:#c1d6dc;font-size:12px;line-height:1.5}
+.journey-plane{color:#f4c680;font-size:25px}.journey-hint{display:block;color:#95b4bd;font-size:10px;margin:10px 0}
+.journey-open{width:100%;justify-content:center;background:#204945;border-color:#427d70}
+#detail-facts>summary{cursor:pointer;color:#8faeb8;font-size:11px;padding:12px 0}
+.flight-active .inspector{display:flex;flex-direction:column}
+.flight-active #detail-facts{order:5}.flight-active .detail-actions{order:2}.flight-active #flight-route{order:1}.flight-active .footer-legal{order:9}.flight-active .bridge-card{order:8}.flight-active .inspector-spacer{display:none}
+.sky-time-travel{background:linear-gradient(110deg,#173b44,#292b45);border:1px solid #43616e;border-radius:14px;padding:18px;display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:22px}
+.sky-time-travel label{font-size:14px;color:#d4ece7}.sky-time-travel strong{font-size:13px;color:#f3d49e}.sky-time-travel input{width:100%;accent-color:#91dfc5;min-height:32px;cursor:ew-resize}.sky-time-travel button{border:1px solid #587276;border-radius:9px;color:#d9eee5;background:#203b42;padding:6px 12px;cursor:pointer}
+@media(max-width:1100px){.flight-play-actions button{font-size:11px;padding:7px 10px}.flight-active .inspector{top:190px}.sky-time-travel{grid-template-columns:1fr}.sky-time-travel strong{grid-row:2}.sky-time-travel input{grid-row:3}}
+@media(prefers-reduced-motion:reduce){.flight-play-actions button:active{transform:none}}

@@ -1,7 +1,12 @@
-// WorldDesk aviation preview. Open ADS-B receptions, not Flightradar24 data.
+// WorldDesk aviation observations with per-source provenance.
 // Licensed ODbL 1.0, credited to adsb.lol contributors. Position accuracy and
 // coverage can vary, especially around mainland China. Never use for navigation.
 export const FLIGHT_PROVIDER='https://www.adsb.lol/'
+export const FLIGHT_SOURCES=Object.freeze({
+ 'fr24':{url:'https://www.flightradar24.com/',label:'Flightradar24 · web feed'},
+ 'adsb.lol':{url:FLIGHT_PROVIDER,label:'adsb.lol · ODbL 1.0'},
+ 'adsb.fi':{url:'https://adsb.fi/',label:'adsb.fi · personal / non-commercial'}
+})
 export const FLIGHT_RADIUS_NM=230
 export const FLIGHT_REGIONS=Object.freeze([
  {id:'current',zh:'当前观测地',en:'Your viewing area'},
@@ -37,10 +42,11 @@ const normalizePlane=(p,now)=>{
   ageSeconds:seenAge,when,sourceUrl:FLIGHT_PROVIDER
  }
 }
-export function normalizeFlights(raw){
+export function normalizeFlights(raw,provider='adsb.lol'){
+ if(!FLIGHT_SOURCES[provider])throw new Error('Unknown flight source')
  if(!Array.isArray(raw?.ac))return []
- const now=number(raw.now)?raw.now:Date.now()/1000
- return raw.ac.map(p=>normalizePlane(p,now)).filter(Boolean).slice(0,250)
+ const now=number(raw.now)?(raw.now>1e12?raw.now/1000:raw.now):Date.now()/1000
+ return raw.ac.map(p=>normalizePlane(p,now)).filter(Boolean).slice(0,250).map(item=>({...item,provider,sourceUrl:FLIGHT_SOURCES[provider].url,...(provider==='fr24'?{route:raw.ac.find(p=>String(p.hex).toLowerCase()===item.hex)?.route||null}:{})}))
 }
 export function formatAltitude(alt,lang='zh'){
  if(alt==='ground')return lang==='zh'?'地面':'Ground'
@@ -51,4 +57,19 @@ export function aircraftDataAge(item,lang='zh'){
  if(!number(item?.ageSeconds))return lang==='zh'?'位置时间未知':'Position age unknown'
  const s=Math.round(item.ageSeconds)
  return lang==='zh'?s+' 秒前收到位置':'Position received '+s+'s ago'
+}
+
+// Keep each observation's provenance; never average positions from different feeds.
+export function mergeFlightSources(snapshots){
+ const planes=new Map()
+ for(const {raw,provider} of snapshots){
+  for(const plane of normalizeFlights(raw,provider)){
+   const previous=planes.get(plane.hex)
+   const newest=!previous||(plane.when??-Infinity)>(previous.when??-Infinity)?plane:previous
+   const candidate=plane.route||previous?.route
+   const route=candidate&&candidate.callsign===newest.callsign?candidate:null
+   planes.set(plane.hex,{...newest,route})
+  }
+ }
+ return [...planes.values()]
 }

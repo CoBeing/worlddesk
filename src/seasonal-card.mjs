@@ -1,11 +1,11 @@
 import {calendarToday,calendarDay,calendarText,calendarMarkdown,validCalendarDate,shiftCalendarDate,MIN_DATE,MAX_DATE,CALENDAR_SOURCE} from './seasonal-calendar.mjs'
 const labels={
- zh:{title:'岁时 · 把今天写进日记',date:'查看日期',today:'今天',prev:'前一天',next:'后一天',phenology:'传统物候',copy:'复制 Markdown',source:'节气知识与来源 ↗',manual:'剪贴板不可用，请手动复制：',copied:'已复制，可粘贴到日记。',invalid:'请选择 1900–2100 年间的有效日期。',unavailable:'历法资料暂不可用；世界探索不受影响。'},
- en:{title:'Seasonal calendar · Keep a note of today',date:'Calendar date',today:'Today',prev:'Previous day',next:'Next day',phenology:'Traditional phenology (Chinese)',copy:'Copy Markdown',source:'Solar terms & source ↗',manual:'Clipboard unavailable. Copy the selected text:',copied:'Copied. Paste into your journal.',invalid:'Choose a valid date between 1900 and 2100.',unavailable:'Calendar unavailable; world exploration is still available.'}
+ zh:{title:'历法与节日 · 岁时',date:'查看日期',today:'今天',prev:'前一天',next:'后一天',phenology:'传统物候',copy:'复制 Markdown',source:'节气知识与来源 ↗',manual:'剪贴板不可用，请手动复制：',copied:'已复制，可粘贴到日记。',invalid:'请选择 1900–2100 年间的有效日期。',unavailable:'历法资料暂不可用；世界探索不受影响。'},
+ en:{title:'Calendar & festivals',date:'Calendar date',today:'Today',prev:'Previous day',next:'Next day',phenology:'Traditional phenology (Chinese)',copy:'Copy Markdown',source:'Solar terms & source ↗',manual:'Clipboard unavailable. Copy the selected text:',copied:'Copied. Paste into your journal.',invalid:'Choose a valid date between 1900 and 2100.',unavailable:'Calendar unavailable; world exploration is still available.'}
 }
 export function createSeasonalCard(root,{lang='zh',openSource=()=>{}}={}){
  let language=lang,date=calendarToday(),followingToday=true,day=null,copySerial=0
- root.innerHTML='<details class="seasonal-details"><summary><span class="seasonal-heading"></span><span class="seasonal-summary"></span></summary><div class="seasonal-body"><div class="seasonal-controls"><button data-action="prev">←</button><label><span class="seasonal-date-label"></span> <input type="date" min="1900-01-01" max="2100-12-31"></label><button data-action="next">→</button><button data-action="today"></button></div><p class="seasonal-zone"></p><div class="seasonal-columns"><div><h3 class="seasonal-lunar"></h3><p class="seasonal-term"></p><small class="seasonal-phenology-label"></small><h3 class="seasonal-phenology"></h3></div><div><p class="seasonal-note"></p><p class="seasonal-caution"></p><button data-action="source"></button></div></div><div class="seasonal-copy"><button data-action="copy"></button><span role="status" class="seasonal-status"></span></div><label class="seasonal-manual" hidden><span></span><textarea readonly rows="8"></textarea></label></div></details>'
+ root.innerHTML='<details class="seasonal-details"><summary><span class="seasonal-heading"></span><span class="seasonal-summary"></span></summary><div class="seasonal-body"><div class="seasonal-controls"><button data-action="prev">←</button><label><span class="seasonal-date-label"></span> <input type="date" min="1900-01-01" max="2100-12-31"></label><button data-action="next">→</button><button data-action="today"></button></div><p class="seasonal-zone"></p><div class="seasonal-columns"><div><h3 class="seasonal-lunar"></h3><p class="seasonal-term"></p><p class="seasonal-festivals"></p><small class="seasonal-holidayNote"></small><small class="seasonal-phenology-label"></small><h3 class="seasonal-phenology"></h3></div><div><p class="seasonal-note"></p><p class="seasonal-caution"></p><button data-action="source"></button></div></div><div class="seasonal-copy"><button data-action="copy"></button><span role="status" class="seasonal-status"></span></div><label class="seasonal-manual" hidden><span></span><textarea readonly rows="8"></textarea></label></div></details>'
  const q=s=>root.querySelector(s),button=action=>q(`[data-action="${action}"]`),text=()=>labels[language]
  function render(){
   copySerial++
@@ -20,11 +20,11 @@ export function createSeasonalCard(root,{lang='zh',openSource=()=>{}}={}){
   try{
    day=calendarDay(date);const t=calendarText(day,language)
    q('.seasonal-summary').textContent=`${date} · ${t.term}`
-   for(const [name,value] of Object.entries({lunar:t.lunar,term:t.term,phenology:day.pentad,note:t.note,caution:t.caution,zone:t.zone}))q(`.seasonal-${name}`).textContent=value
+   for(const [name,value] of Object.entries({lunar:t.lunar,term:t.term,festivals:t.festivals,holidayNote:t.holidayNote,phenology:day.pentad,note:t.note,caution:t.caution,zone:t.zone}))q(`.seasonal-${name}`).textContent=value
    button('copy').disabled=false
   }catch{
    day=null;button('copy').disabled=true;q('.seasonal-summary').textContent=l.unavailable
-   for(const name of ['lunar','term','phenology','note','caution','zone'])q(`.seasonal-${name}`).textContent=''
+   for(const name of ['lunar','term','festivals','holidayNote','phenology','note','caution','zone'])q(`.seasonal-${name}`).textContent=''
   }
  }
  function select(iso){
@@ -44,6 +44,7 @@ export function createSeasonalCard(root,{lang='zh',openSource=()=>{}}={}){
  })
  render()
  return {
+  selectDate:select,
   updateLanguage(value){language=value==='zh'?'zh':'en';render()},
   tick(now=new Date()){const today=calendarToday(now);if(followingToday&&today!==date){date=today;render()}}
  }

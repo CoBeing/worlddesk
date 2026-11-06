@@ -29,3 +29,11 @@ The adapter and presentation consolidate user-owned Luo work. No private factory
 - Browser acceptance covers expansion, language switching, copy fallback, date validation, view visibility and operation with external network requests blocked.
 
 No claim of astronomical second-level equivalence is made. Upgrade the pinned dependency only when needed, rerun regression checks, and retain source/phenology boundaries.
+
+## Sky & calendar experience (2026-11-06)
+
+World Pulse → Sky & calendar contains locally drawn sunrise/sunset illustrations, a calculated current Moon face, eight selectable phase illustrations and a Sun–Earth–Moon teaching diagram. Illustration geometry follows illumination, rather than substituting emoji or photographs for current conditions. Selecting a phase enters a clearly labelled demonstration; returning to current phase restores SunCalc output. Diagrams are not to scale, omit orbital inclination, use a northern-view Moon-face convention, and do not predict eclipses or local visibility. Sunrise/sunset times use the selected city's timezone; the calendar stays on Beijing civil dates.
+
+The calendar now lists Chinese solar/lunar festivals from the pinned lunar-typescript engine and includes them in Markdown export. These names are **not official days-off / make-up-workday schedules**. Those schedules are not imported or guessed. Date navigation allows checking specific festival dates. The calendar date does not change the current sky calculation or turn a demonstration into a forecast.
+
+References: [NASA Moon phases](https://science.nasa.gov/moon/moon-phases/), [SunCalc API](https://github.com/mourner/suncalc), and the engine/source links listed earlier in this document.

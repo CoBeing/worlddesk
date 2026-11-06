@@ -52,6 +52,8 @@ jobs:
         env:
           LOCAL_BRIDGE_REPO: ./bridge
         run: node scripts/prepare-bridge.mjs
+      - name: Test native commands
+        run: cargo test --manifest-path src-tauri/Cargo.toml
       - name: Build unsigned app
         run: npm run tauri:build -- --bundles ${{ matrix.bundle }}
       - name: Package and upload

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import {normalizeFlights,formatAltitude,FLIGHT_REGIONS} from './flights.mjs'
+import {normalizeFlights,mergeFlightSources,formatAltitude,FLIGHT_REGIONS} from './flights.mjs'
 test('normalizes real ADS-B positions, height and heading',()=>{
  const data={now:1793534800,ac:[{hex:'7805d5',flight:'CXA8508 ',lat:31.1,lon:117.2,alt_baro:23600,gs:450,track:270,seen_pos:6,r:'B-5488',t:'B738'}]}
  const x=normalizeFlights(data)
@@ -24,4 +24,19 @@ test('formats altitudes and includes China and world choices',()=>{
  assert.equal(formatAltitude('ground','zh'),'地面')
  assert.ok(FLIGHT_REGIONS.find(r=>r.id==='shanghai'))
  assert.ok(FLIGHT_REGIONS.find(r=>r.id==='london'))
+})
+
+test('provider millisecond timestamps normalize to observation milliseconds',()=>{
+ const now=1793969783500
+ const [item]=normalizeFlights({now,ac:[{hex:'abcdef',lat:51,lon:0,seen_pos:2}]})
+ assert.equal(item.when,now-2000)
+})
+
+test('automatic aggregation deduplicates aircraft using newest observation',()=>{
+ const a={now:1793969783500,ac:[{hex:'abcdef',lat:51,lon:0,seen_pos:2}]}
+ const b={now:1793969784500,ac:[{hex:'abcdef',lat:51.01,lon:0,seen_pos:1},{hex:'123456',lat:52,lon:1,seen_pos:0}]}
+ const merged=mergeFlightSources([{provider:'adsb.lol',raw:a},{provider:'adsb.fi',raw:b}])
+ assert.equal(merged.length,2)
+ assert.equal(merged.find(x=>x.hex==='abcdef').provider,'adsb.fi')
+ assert.equal(mergeFlightSources([{provider:'adsb.lol',raw:a}]).length,1)
 })

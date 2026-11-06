@@ -1,4 +1,7 @@
 const zh={
+ exploreNearby:'⌖ 我附近',exploreRandom:'✦ 随机跟一架',exploreBusy:'✈ 去繁忙机场',moreDetails:'更多详情与来源',journeyMap:'查看整段旅程',journeyHint:'虚线连接起降机场 · 实线是已观察轨迹',journeyTitle:'这架飞机去哪儿',
+  flightProvider:'位置来源',flightRoute:'呼号关联航线',flightRouteLoading:'正在查询起降机场…',flightRouteUnknown:'暂无可靠的起降机场资料',flightRouteNote:'adsbdb 呼号关联资料，可能过期；并非本次航班的起降确认。',flightTraceNote:'实线：本次观察收到的位置；断点不补画。至少两次有效位置后显示。',flightFiTerms:'adsb.fi 仅限个人非商业使用；商业使用需联系来源授权。',
+  diagnostics:'帮助与诊断',exploreStart:'去看看世界',exploreSky:'查看当地天空',clearFlightFilters:'清除搜索并显示地面飞机',flightNoMatches:'没有符合筛选条件的飞机。可以清除筛选，或切换空域。',radioFailed:'这个电台暂时无法播放，请选择其他电台重试。',
   flightHeadline:'此刻飞行 · 真实空域',
   navAll:'世界脉搏',navFlight:'飞行现场',headAll:'此刻的世界',
   pulseTitle:'此刻值得看看',pulseSky:'今晚的天空',pulseFlight:'看看空中的飞机',pulseVisual:'东亚卫星观测',pulseFlightSub:'跟随附近真实的飞机，查看航向与飞行高度。',
@@ -38,7 +41,7 @@ const zh={
   kicker:'YOUR WINDOW TO THE WORLD',tagline:'打开世界，随时去远方。',
   micro:'WORLD SIGNALS · 真实世界的窗口',heroLine1:'此刻，世界正在',heroLine2:'发生什么？',
   heroText:'看看中国与远方的地球现象、天空和广播。不必计划出发，也可以遇见世界。',
-  surprise:'✦ 给我一个惊喜',signals:'WORLD SIGNALS',headAll:'正在发生',headNearby:'附近观察',headSky:'此刻的天空',headQuake:'地震观察',headEvent:'地球自然事件',headRadio:'听听世界',headSaved:'我的收藏',
+  surprise:'✦ 给我一个惊喜',signals:'WORLD SIGNALS',headAll:'正在发生',headNearby:'附近观察',headSky:'天空与历法',headQuake:'地震观察',headEvent:'地球自然事件',headRadio:'听听世界',headSaved:'我的收藏',
   feedPublic:'公开数据 · 由来源更新',feedSaved:'保存在当前设备',loading:'连接世界数据…',loadingWorld:'读取公开世界数据…',countSuffix:' 条可探索记录',noFeeds:'公开数据暂不可用',nearbyTip:'显示观测地附近约 2,000 公里内的事件，也包含当地天空现象。',
   mapLabel:'● 世界观察',mapCaption:'本机地球轮廓 · 非导航地图',detailKicker:'✦ DISCOVERY CARD',
   welcome:'世界这么大，随便看看。',welcomeSub:'从地图或列表选择真实世界现象，也可以点“给我一个惊喜”。',
@@ -72,6 +75,9 @@ const zh={
   countryChina:'中国',
 }
 const en={
+ exploreNearby:'⌖ Near me',exploreRandom:'✦ Follow a surprise',exploreBusy:'✈ Airport hopping',moreDetails:'Details & sources',journeyMap:'See the whole journey',journeyHint:'Dashed: airport connection · Solid: observed track',journeyTitle:'Where is this plane going?',
+  flightProvider:'Position source',flightRoute:'Callsign-associated route',flightRouteLoading:'Looking up airports…',flightRouteUnknown:'No reliable airport information',flightRouteNote:'Callsign metadata from adsbdb may be outdated; not confirmed departures or arrivals for this flight.',flightTraceNote:'Solid line: positions received this session; gaps stay open. Requires two valid positions.',flightFiTerms:'adsb.fi is for personal, non-commercial use; contact the provider for commercial use.',
+  diagnostics:'Help & diagnostics',exploreStart:'Explore the world',exploreSky:'Explore the local sky',clearFlightFilters:'Clear search and include ground aircraft',flightNoMatches:'No aircraft match these filters. Clear filters or choose another region.',radioFailed:'This station cannot play right now. Choose another station to try again.',
   flightHeadline:'Flight Live · Real Airspace',
   navAll:'World Pulse',navFlight:'Flight Live',headAll:'World Right Now',
   pulseTitle:'Worth a Look Now',pulseSky:'Your Evening Sky',pulseFlight:'Airborne Near Here',pulseVisual:'East Asia From Space',pulseFlightSub:'Follow actual aircraft nearby: heading, speed and altitude.',
@@ -111,7 +117,7 @@ const en={
   kicker:'YOUR WINDOW TO THE WORLD',tagline:'Open the world. Go anywhere.',
   micro:'WORLD SIGNALS · A WINDOW TO REALITY',heroLine1:'Right now, the world',heroLine2:'is happening.',
   heroText:'Explore the sky, natural events and radio from China and far beyond, without planning a trip.',
-  surprise:'✦ Surprise me',signals:'WORLD SIGNALS',headAll:'Happening Now',headNearby:'Around You',headSky:'Sky Right Now',headQuake:'Earthquakes',headEvent:'Nature Events',headRadio:'World Radio',headSaved:'My Favorites',
+  surprise:'✦ Surprise me',signals:'WORLD SIGNALS',headAll:'Happening Now',headNearby:'Around You',headSky:'Sky & calendar',headQuake:'Earthquakes',headEvent:'Nature Events',headRadio:'World Radio',headSaved:'My Favorites',
   feedPublic:'Public feeds · Updated by source',feedSaved:'Saved on this device',loading:'Connecting to the world…',loadingWorld:'Loading public world data…',countSuffix:' things to explore',noFeeds:'Public feeds currently unavailable',nearbyTip:'Events within roughly 2,000 km of your chosen city, plus sky observations.',
   mapLabel:'● World observations',mapCaption:'Offline coastline sketch · Not for navigation',detailKicker:'✦ DISCOVERY CARD',
   welcome:'A world to wander.',welcomeSub:'Choose an observation on the map or in the list, or let the world surprise you.',
