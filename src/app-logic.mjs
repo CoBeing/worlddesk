@@ -11,6 +11,7 @@ import {createCinema} from './cinema.mjs'
 import {createSkyVisuals} from './sky-visuals.mjs'
 let skyVisuals
 let seasonalCard
+import {createRadioHealth,probeRadio} from './radio-health.mjs'
 import {journeyPoints} from './journey.mjs'
 import {adaptFr24,fr24Bounds} from './fr24.mjs'
 import {appendTrack,trackSegments,normalizeRoute} from './flight-tracks.mjs'
@@ -24,6 +25,12 @@ const LOCAL_SAVED='worlddesk:favorites:v1'
 const LOCAL_MAP='worlddesk:map:v1'
 const readLocal=(key)=>{try{return localStorage.getItem(key)}catch{return null}}
 const writeLocal=(key,value)=>{try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value)}catch{}}
+let storedRadioHealth=[]
+try{storedRadioHealth=JSON.parse(readLocal('worlddesk:radio-health:v1')||'[]')}catch{}
+const radioHealth=createRadioHealth(storedRadioHealth)
+let radioProbeController=null
+const playableRadios=()=>state.radio.filter(r=>radioHealth.available(r))
+function saveRadioHealth(){writeLocal('worlddesk:radio-health:v1',JSON.stringify(radioHealth.snapshot()))}
 const preferred=readLocal(LOCAL_LOCALE)||'auto'
 const state={
  lang:pickLanguage(navigator.languages?.[0]||navigator.language,preferred),
@@ -294,13 +301,14 @@ function nearValues(){
 }
 function allAvailable(){
  const all=[...state.sky,...nearValues().filter(x=>x.kind!=='sky'),
-  ...state.radio.filter(radioInChina).slice(0,24),...state.event,...state.quake,...state.radio]
+  ...playableRadios().filter(radioInChina).slice(0,24),...state.event,...state.quake,...playableRadios()]
  const result=[],seen=new Set()
  for(const x of all)if(!seen.has(x.id)){seen.add(x.id);result.push(x)}
  return result
 }
 function viewItems(){
- if(state.view==='saved')return [...state.saved.values()]
+ if(state.view==='saved')return [...state.saved.values()].filter(x=>x.kind!=='radio'||radioHealth.available(x))
+ if(state.view==='radio')return playableRadios()
  if(state.view==='nearby')return nearValues()
  if(state.view==='all')return allAvailable()
  if(state.view==='flight'){
@@ -444,7 +452,7 @@ function renderWorldPulse(){
  root.replaceChildren()
  const records=makeWorldPulse({
   sky:state.sky,flight:state.flight,event:state.event,
-  quake:state.quake,radio:state.radio,
+  quake:state.quake,radio:playableRadios(),
   visual:state.cinema?.getScene('sat:asia')||null
  })
  for(const record of records.slice(0,4)){
@@ -670,6 +678,7 @@ function selectItem(item,fly=true){
 }
 function changeView(view){
  const old=state.view
+ if(view!=='radio')radioProbeController?.abort()
  const previouslyWatching=old==='watch'
  if(previouslyWatching&&view!=='watch')state.cinema?.stop()
  state.view=view
@@ -1069,12 +1078,35 @@ export function mountWorldDesk(){
  })
  for(const btn of document.querySelectorAll('[data-subview]'))
   btn.addEventListener('click',()=>changeView(btn.dataset.subview))
+ el('player').addEventListener('play',()=>radioProbeController?.abort())
  el('player').addEventListener('error',()=>{
-  if(!el('player').getAttribute('src'))return
-  el('radio-status').textContent=t('radioFailed')
-  el('radio-status').hidden=false
+  const player=el('player')
+  if(!player.getAttribute('src')||![2,3,4].includes(player.error?.code))return
+  const item=state.radio.find(r=>r.id===state.playerId)||state.saved.get(state.playerId)
+  if(!item||player.currentSrc!==player.src)return
+  radioHealth.record(item,'failed');saveRadioHealth()
+  el('radio-status').textContent=t('radioFailed');el('radio-status').hidden=false
+  renderItems();renderWorldPulse()
  })
- el('player').addEventListener('playing',()=>{el('radio-status').hidden=true})
+ el('player').addEventListener('playing',()=>{
+  const item=state.radio.find(r=>r.id===state.playerId)||state.saved.get(state.playerId)
+  if(item){radioHealth.record(item,'ok');saveRadioHealth()}
+  el('radio-status').hidden=true
+ })
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)radioProbeController?.abort()})
+ async function checkNextRadio(){
+  if(radioProbeController||document.hidden||state.view!=='radio'||!el('player').paused)return
+  const item=state.radio.find(r=>r.id!==state.playerId&&radioHealth.needsCheck(r))
+  if(!item)return
+  const controller=new AbortController();radioProbeController=controller
+  try{
+   const result=await probeRadio(item.streamUrl,{signal:controller.signal})
+   if(result==='cancelled')return
+   radioHealth.record(item,result);saveRadioHealth()
+   renderItems();renderWorldPulse()
+  }finally{if(radioProbeController===controller)radioProbeController=null}
+ }
+ setInterval(()=>void checkNextRadio(),30000)
  el('bridge-check').addEventListener('click',()=>void checkBridge())
  applyLanguage();tick()
  setInterval(tick,30000)

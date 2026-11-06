@@ -1,8 +1,14 @@
-# WorldDesk v0.1.0-preview.5 — Follow a plane, play with the Moon
+# WorldDesk v0.1.0-preview.6 — Quiet radio checks, effortless listening
 
 **macOS Apple Silicon · unsigned preview · no account required.**
 
-## Explore in one click
+## Radio that gets out of your way
+
+- Quietly checks one station at a time, at most once every 30 seconds while World Radio is visible and playback is paused. No audible autoplay or check button.
+- Temporarily hides streams that report network/decoder errors; successful checks are cached for six hours, failed checks for thirty minutes. Expired entries recover automatically; timeouts are retried later without hiding the station.
+- Background checks stop when listening starts, the view changes or the window is hidden. Favorites are retained; hidden stations are not deleted.
+
+## Also included: explore in one click
 
 - **Pick a plane and see its journey.** Departure/destination airports and cities lead the detail card. Dashed great-circle airport connections and solid observed tracks appear on the map; technical details stay folded away.
 - **Near me, follow a surprise, airport hopping.** Three quick actions take you straight into exploration. Selecting a plane clears space for its map and route.

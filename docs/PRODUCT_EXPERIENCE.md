@@ -98,3 +98,7 @@ NN/g 的 [Recognition and Recall](https://www.nngroup.com/articles/recognition-a
 ### 机场目录来源
 
 `src/airports.json` 为 OurAirports 公共领域 airports.csv 的 IATA 机场子集（排除关闭机场、直升机场、水上机场），2026-11-06 下载，8799 条。保留机场名、城市和经纬度，未翻译国际名称。来源：https://ourairports.com/data/ 。机场连线是旅程示意，不是实际飞行航路；没有坐标时仍显示机场卡片而不猜位置。
+
+## Preview.6：电台低频后台检测
+
+仅在电台页可见且播放器暂停时，每 30 秒最多检查一台；静音加载，不自动发声。可用缓存 6 小时，失败隐藏 30 分钟，超时不隐藏、15 分钟后可复查。用户播放、离开电台页或页面后台时终止探测。缓存最多 200 条，保存在本机；收藏原记录不删除。
