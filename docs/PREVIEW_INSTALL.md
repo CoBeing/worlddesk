@@ -2,12 +2,12 @@
 
 ## Official downloads
 
-Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. For v0.1.0-preview.3, only macOS Apple Silicon is currently released; Windows and Linux are deferred until the Mac user experience is validated. Verify the file SHA-256 against the release checksum asset.
+Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. From v0.1.0-preview.7, macOS Apple Silicon and Windows x64 downloads are provided. Verify the file SHA-256 against the release checksum asset.
 
 | Platform | File | Procedure |
 |---|---|---|
 | macOS Apple Silicon (M1/M2/M3/M4) | WorldDesk-Preview-macos-arm64.zip | Unzip and drag WorldDesk Preview.app into Applications |
-| Windows x64 (later) | Not in v0.1.0-preview.2 | Return after native Mac acceptance |
+| Windows x64 | WorldDesk-Preview-windows-x64.exe | Run the installer |
 | Ubuntu/Debian x64 (later) | Not in v0.1.0-preview.2 | Return after native Mac acceptance |
 
 If a platform file is missing, that platform build has not been published or verified.
@@ -33,7 +33,7 @@ USGS, NASA EONET and Radio Browser rely on the public Internet; the bundled coas
 
 CoBeing Basic remains in active development; user logins, memory sync, multiplayer rooms and private Agent operations are not available yet. WorldDesk provides its own sky calculation and world-event visualization; there is no CoBeing or God’s Eye View connection in this Preview.
 
-No signing certificate or notarization is used for this release; future updates are installed manually.
+No OS signing certificate or notarization is used. Starting with Preview.7, updates are checked silently ten seconds after startup and every six hours while the window is visible and online. A small navigation button offers download and installation; on Mac, restart when convenient. Windows installation can close the app automatically. Update packages are cryptographically verified. Older versions require one manual installation of Preview.7.
 
 ## Locale and IP location
 

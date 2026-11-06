@@ -1,3 +1,4 @@
+import { mountUpdater } from './updater.mjs'
 import {mountWorldDesk} from './app-logic.mjs'
 
 const app=document.getElementById('app')
@@ -100,3 +101,5 @@ app.innerHTML=[
 
 
 mountWorldDesk()
+
+mountUpdater()

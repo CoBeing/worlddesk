@@ -1,4 +1,4 @@
-name: Unsigned WorldDesk Preview
+name: WorldDesk Desktop Release
 
 on:
   push:
@@ -15,16 +15,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "WorldDesk $GITHUB_REF_NAME (unsigned)" --notes-file RELEASE_NOTES.md --prerelease --verify-tag
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "WorldDesk $GITHUB_REF_NAME (unsigned)" --notes-file RELEASE_NOTES.md --draft --prerelease --verify-tag
   build:
     needs: release
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Mac-first validation. Windows/Linux remain supported by source/build scripts
-          # but are not published until native acceptance is complete.
           - {os: macos-15, label: macos, bundle: app}
+          - {os: windows-latest, label: windows, bundle: nsis}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +53,10 @@ jobs:
         run: node scripts/prepare-bridge.mjs
       - name: Test native commands
         run: cargo test --manifest-path src-tauri/Cargo.toml
-      - name: Build unsigned app
+      - name: Build app and signed updater artifacts
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         run: npm run tauri:build -- --bundles ${{ matrix.bundle }}
       - name: Package and upload
         shell: bash
@@ -70,12 +72,15 @@ jobs:
               test -n "$APP"
               ARCH=$(uname -m)
               ditto -c -k --keepParent "$APP" "release-assets/WorldDesk-Preview-macos-$ARCH.zip"
+              cp "$APP.tar.gz" release-assets/WorldDesk-Preview-macos-arm64.app.tar.gz
+              cp "$APP.tar.gz.sig" release-assets/WorldDesk-Preview-macos-arm64.app.tar.gz.sig
               CHECKSUM_FILE="SHA256-macos-$ARCH.txt"
               ;;
             windows)
               FILE=$(find src-tauri/target/release/bundle/nsis -name '*.exe' -type f -print -quit)
               test -n "$FILE"
               cp "$FILE" release-assets/WorldDesk-Preview-windows-x64.exe
+              cp "$FILE.sig" release-assets/WorldDesk-Preview-windows-x64.exe.sig
               CHECKSUM_FILE="SHA256-windows-x64.txt"
               ;;
             linux)
@@ -87,3 +92,21 @@ jobs:
           esac
           CHECKSUM_FILE="$CHECKSUM_FILE" node -e "const fs=require('fs'),crypto=require('crypto');const p='release-assets';let s='';for(const f of fs.readdirSync(p)){s+=crypto.createHash('sha256').update(fs.readFileSync(p+'/'+f)).digest('hex')+'  '+f+'\n'}fs.writeFileSync(p+'/'+process.env.CHECKSUM_FILE,s)"
           gh release upload "$GITHUB_REF_NAME" release-assets/* --clobber
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Publish complete release and updater channel
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download "$GITHUB_REF_NAME" --dir release-assets
+          cd release-assets
+          sha256sum --check SHA256-*.txt
+          cd ..
+          node scripts/publish-update.mjs

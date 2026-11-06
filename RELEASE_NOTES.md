@@ -1,6 +1,12 @@
-# WorldDesk v0.1.0-preview.6 — Quiet radio checks, effortless listening
+# WorldDesk v0.1.0-preview.7 — Quiet radio checks, effortless listening
 
-**macOS Apple Silicon · unsigned preview · no account required.**
+**macOS Apple Silicon + Windows x64 · preview · no account required.**
+
+## Desktop downloads and updates
+
+- macOS ZIP and Windows installer are provided together.
+- Checks for updates quietly at startup and every six hours. A small button offers installation; downloaded updates are verified with a dedicated signing key.
+- Install this version manually once to enable future in-app updates.
 
 ## Radio that gets out of your way
 
@@ -22,4 +28,4 @@
 - Airport connections illustrate a journey, not an actual flown route. Observed tracks begin with this app session. Airport coordinates/names use the bundled OurAirports public-domain IATA catalog.
 - FR24 integration uses its public web feed, not its official paid API. Availability and formats can change; other sources remain available when one fails. Provider terms and attribution remain applicable; adsb.fi is personal/non-commercial.
 - Moon and Sun images are calculated teaching illustrations, not photographs or weather forecasts. Calendar dates use Beijing time; observation times use the selected city's timezone.
-- This release is unsigned/unnotarized for macOS Apple Silicon. Verify the ZIP against its SHA-256 file. No login, automatic updater or background Bridge service. Windows/Linux packages are not included.
+- Packages do not have Apple notarization or Windows Authenticode certificates; the OS may show a security prompt. Updater signatures verify update authenticity separately. SHA-256 files are included. Linux packages are not included.

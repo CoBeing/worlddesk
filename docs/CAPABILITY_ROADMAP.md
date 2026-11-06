@@ -30,7 +30,7 @@ WorldDesk is a standalone application for curious world explorers, not a link hu
 
 ## Multiple OSes, macOS first
 
-The project uses a single Vanilla JS + Vite + Tauri 2 codebase. The default Mac flight map can switch between detailed/low-light vector tiles and the bundled coastline sketch. Vector renderer is lazily loaded. The Bridge sidecar build script selects a Rust target triple, allowing future Windows and Linux packaging. This new preview tag publishes macOS Apple Silicon only; Windows/Linux CI release jobs are intentionally inactive until Mac user experience and platform-specific installation are accepted. Preserve cross-platform compatibility in code; avoid duplicating the application for each OS.
+The project uses a single Vanilla JS + Vite + Tauri 2 codebase. The default Mac flight map can switch between detailed/low-light vector tiles and the bundled coastline sketch. Vector renderer is lazily loaded. The Bridge sidecar build script selects a Rust target triple, allowing future Windows and Linux packaging. Preview.7 publishes macOS Apple Silicon and Windows x64 together with signed updater artifacts; Linux remains deferred. Preserve cross-platform compatibility in code; avoid duplicating the application for each OS.
 
 Language and geographic observation context are separate. A Chinese-language user can explore Singapore and an English-language user can explore Shanghai.
 
