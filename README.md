@@ -30,7 +30,7 @@ Calculations run locally using pinned `lunar-typescript` (MIT), for civil dates 
 
 **[Get WorldDesk Preview on GitHub Releases](https://github.com/CoBeing/worlddesk/releases)**
 
-Unsigned and unnotarized packages are for testing. Read [install and safety notes](docs/PREVIEW_INSTALL.md) and verify the SHA-256 checksum for the exact downloaded file. Packages have no OS signing certificate or login service. Preview.7 adds signed in-app updates for macOS Apple Silicon and Windows x64.
+Unsigned and unnotarized packages are for testing. Read [install and safety notes](docs/PREVIEW_INSTALL.md) and verify the SHA-256 checksum for the exact downloaded file. Packages have no OS signing certificate or login service. Preview.8 adds signed in-app updates for macOS Apple Silicon and Windows x64.
 
 ## Build from source
 

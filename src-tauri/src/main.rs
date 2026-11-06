@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 //! WorldDesk owns the user experience. Local Bridge is an independently built sidecar
 //! for generic OS-user-local capabilities. No global services, registration,
 //! model invocation or sensitive providers are enabled just by opening WorldDesk.

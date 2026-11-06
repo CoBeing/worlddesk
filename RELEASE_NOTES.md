@@ -1,4 +1,4 @@
-# WorldDesk v0.1.0-preview.7 — Quiet radio checks, effortless listening
+# WorldDesk v0.1.0-preview.8 — Quiet radio checks, effortless listening
 
 **macOS Apple Silicon + Windows x64 · preview · no account required.**
 

@@ -2,7 +2,7 @@
 
 ## Official downloads
 
-Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. From v0.1.0-preview.7, macOS Apple Silicon and Windows x64 downloads are provided. Verify the file SHA-256 against the release checksum asset.
+Open https://github.com/CoBeing/worlddesk/releases and choose the latest prerelease. From v0.1.0-preview.8, macOS Apple Silicon and Windows x64 downloads are provided. Verify the file SHA-256 against the release checksum asset.
 
 | Platform | File | Procedure |
 |---|---|---|
@@ -33,7 +33,7 @@ USGS, NASA EONET and Radio Browser rely on the public Internet; the bundled coas
 
 CoBeing Basic remains in active development; user logins, memory sync, multiplayer rooms and private Agent operations are not available yet. WorldDesk provides its own sky calculation and world-event visualization; there is no CoBeing or God’s Eye View connection in this Preview.
 
-No OS signing certificate or notarization is used. Starting with Preview.7, updates are checked silently ten seconds after startup and every six hours while the window is visible and online. A small navigation button offers download and installation; on Mac, restart when convenient. Windows installation can close the app automatically. Update packages are cryptographically verified. Older versions require one manual installation of Preview.7.
+No OS signing certificate or notarization is used. Starting with Preview.8, updates are checked silently ten seconds after startup and every six hours while the window is visible and online. A small navigation button offers download and installation; on Mac, restart when convenient. Windows installation can close the app automatically. Update packages are cryptographically verified. Older versions require one manual installation of Preview.8.
 
 ## Locale and IP location
 
