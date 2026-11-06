@@ -1,6 +1,13 @@
-# WorldDesk v0.1.0-preview.8 — Quiet radio checks, effortless listening
+# WorldDesk v0.1.0-preview.9 — Keep your view, explore one journey
 
 **macOS Apple Silicon + Windows x64 · preview · no account required.**
+
+## Flight map experience
+
+- Clicking a plane keeps the current map scale and center; selecting from the list pans without zooming out.
+- Whole journey opens a dedicated single-flight overview with airport labels and a full map canvas. Other traffic and the detail panel stay out of the way. Return restores the previous view and traffic.
+- Cross-dateline coastlines no longer form bands across the map. Late location responses cannot move an actively selected flight view.
+- Visually checked short-haul, long-haul and date-line routes at 1410×880 and 960×650, including label visibility and returning to the original view.
 
 ## Desktop downloads and updates
 

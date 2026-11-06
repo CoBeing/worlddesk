@@ -13,6 +13,7 @@ let skyVisuals
 let seasonalCard
 import {createRadioHealth,probeRadio} from './radio-health.mjs'
 import {journeyPoints} from './journey.mjs'
+import {unwrapLand} from './map-geometry.mjs'
 import {adaptFr24,fr24Bounds} from './fr24.mjs'
 import {appendTrack,trackSegments,normalizeRoute} from './flight-tracks.mjs'
 import {mergeFlightSources,FLIGHT_SOURCES,FLIGHT_REGIONS,FLIGHT_RADIUS_NM,formatAltitude,aircraftDataAge} from './flights.mjs'
@@ -158,8 +159,8 @@ function setLocation(loc){
  if(state.selected)showDetail(state.selected)
  if(loc?.lat!==undefined){
   const zoom=loc.country==='CN'?4:loc.country==='SG'?5:3
-  map.setView([loc.lat,loc.lon],zoom,{animate:false})
-  showPosition()
+  if(state.view!=='flight'||!state.flightPanelOpen)map.setView([loc.lat,loc.lon],zoom,{animate:false})
+  if(!journeyContext)showPosition()
  }
  if(!state.selected&&state.sky.length)selectItem(state.sky[0],false)
 }
@@ -204,6 +205,9 @@ let map
 let markers
 let airportCatalog={}
 let airportLoading
+let journeyContext=null
+let addJourneyWorldCopies
+let journeyBackdrop
 let journeyLayer
 let traceRenderer
 let traceLayer
@@ -211,12 +215,25 @@ const routeCache=new Map()
 const routePending=new Map()
 function initializeMap(){
 map=L.map('world-map',{zoomControl:false,worldCopyJump:true,preferCanvas:true,
- maxZoom:11,minZoom:1}).setView([28,105],3)
+ maxZoom:11,minZoom:1,zoomSnap:.25}).setView([28,105],3)
 map.attributionControl.setPrefix(false)
+map.createPane('journey-land').style.zIndex=250
+map.getPane('journey-land').style.pointerEvents='none'
 state.map=map
 const sketch=L.layerGroup().addTo(map)
-const landGeo=feature(landTopology,landTopology.objects.land)
-L.geoJSON(landGeo,{interactive:false,style:{
+const landGeo=unwrapLand(feature(landTopology,landTopology.objects.land))
+journeyBackdrop=L.layerGroup().addTo(map)
+const shiftCoordinates=(coords,shift)=>typeof coords[0]==='number'?[coords[0]+shift,...coords.slice(1)]:coords.map(c=>shiftCoordinates(c,shift))
+addJourneyWorldCopies=()=>{
+ journeyBackdrop.clearLayers()
+ for(const shift of [-360,360]){
+  const copy=JSON.parse(JSON.stringify(landGeo))
+  const move=g=>{if(g.coordinates)g.coordinates=shiftCoordinates(g.coordinates,shift);if(g.geometries)g.geometries.forEach(move)}
+  if(copy.features)copy.features.forEach(f=>move(f.geometry));else move(copy.geometry||copy)
+  L.geoJSON(copy,{interactive:false,renderer:L.svg({pane:'journey-land'}),noClip:true,smoothFactor:0,style:{color:'#3e8590',weight:.7,fillColor:'#1a6064',fillOpacity:.57}}).addTo(journeyBackdrop)
+ }
+}
+L.geoJSON(landGeo,{interactive:false,renderer:L.svg({pane:'journey-land'}),noClip:true,smoothFactor:0,style:{
  color:'#3e8590',weight:.7,opacity:.55,fillColor:'#1a6064',fillOpacity:.57
 }}).addTo(sketch)
 for(let lat=-60;lat<=60;lat+=30){
@@ -268,7 +285,7 @@ async function useBasemap(){
     const caption=document.querySelector('.map-caption span:last-child')
     if(status==='fallback'){
      caption.textContent=t('mapFallback')+' · © Natural Earth'
-     if(state.view==='flight')toast(t('mapFallback'))
+     if(state.view==='flight'&&!journeyContext)toast(t('mapFallback'))
     }else if(status==='loading')caption.textContent=t('mapPending')+' · OpenFreeMap'
     else if(status==='ready')caption.textContent=style==='offline'?t('mapOffline')+' · © Natural Earth':t('mapReady')+' · OpenFreeMap'
    })
@@ -276,7 +293,7 @@ async function useBasemap(){
   })
   .catch(()=>{
    document.querySelector('.map-caption span:last-child').textContent=t('mapFallback')+' · © Natural Earth'
-   if(state.view==='flight')toast(t('mapFallback'))
+   if(state.view==='flight'&&!journeyContext)toast(t('mapFallback'))
   })
   .finally(()=>{basemapLoading=null})
  return basemapLoading
@@ -332,13 +349,55 @@ function journeySegments(item){
  if(!route)return []
  const stops=[route.origin,route.via,route.destination].filter(Boolean)
  if(stops.some(a=>!a.point))return []
- return stops.slice(1).map((a,i)=>journeyPoints(stops[i].point,a.point))
+ let previous
+ return stops.slice(1).map((a,i)=>{
+  const points=journeyPoints(stops[i].point,a.point)
+  const shift=previous===undefined?0:360*Math.round((previous-points[0][1])/360)
+  const leg=points.map(([lat,lon])=>[lat,lon+shift]);previous=leg.at(-1)[1]
+  return leg
+ })
+}
+function journeyPoint(point){
+ if(!point||!journeyContext)return point
+ const lon=point[1]+360*Math.round((journeyContext.longitude-point[1])/360)
+ return [point[0],lon]
+}
+function endJourney(){
+ if(!journeyContext)return
+ const previous=journeyContext
+ journeyContext=null
+ document.querySelector('.app-shell').classList.remove('journey-overview')
+ el('journey-overview-bar')?.remove()
+ journeyBackdrop.clearLayers()
+ for(const {marker} of state.offlineCities)state.offlineSketch.addLayer(marker)
+ showPosition()
+ state.followedHex=previous.followedHex
+ map.invalidateSize({animate:false})
+ map.setView(previous.center,previous.zoom,{animate:false})
+ void useBasemap()
+ renderMarkers()
 }
 function frameJourney(item){
  const segments=journeySegments(item)
  if(!segments.length)return false
  const points=segments.flat()
- map.fitBounds(L.latLngBounds(points).pad(.18),{paddingTopLeft:[40,90],paddingBottomRight:[330,40],maxZoom:8,animate:!matchMedia('(prefers-reduced-motion: reduce)').matches})
+ if(!journeyContext)journeyContext={center:map.getCenter(),zoom:map.getZoom(),followedHex:state.followedHex}
+ journeyContext.longitude=(Math.min(...points.map(p=>p[1]))+Math.max(...points.map(p=>p[1])))/2
+ state.followedHex=null
+ document.querySelector('.app-shell').classList.add('journey-overview')
+ el('journey-overview-bar')?.remove()
+ const bar=create('div',null,'journey-overview-bar');bar.id='journey-overview-bar'
+ const route=itemRoute(item)
+ const title=create('div');title.append(create('strong',`${route.origin.city||route.origin.code} → ${route.destination.city||route.destination.code}`),create('small',`${item.callsign||item.title} · ${state.lang==='zh'?'起降机场连线，非实际飞行路线':'Airport connection, not the actual flight path'}`))
+ const back=create('button',state.lang==='zh'?'← 返回飞机现场':'← Back to aircraft','soft-action')
+ back.onclick=endJourney;bar.append(title,back);el('world-map').parentElement.append(bar)
+ state.basemap?.setStyle('offline')
+ for(const {marker} of state.offlineCities)state.offlineSketch.removeLayer(marker)
+ if(positionMarker)map.removeLayer(positionMarker)
+ addJourneyWorldCopies()
+ renderMarkers()
+ map.invalidateSize({animate:false})
+ map.fitBounds(L.latLngBounds([...points,journeyPoint(item.point)].filter(Boolean)),{paddingTopLeft:[115,150],paddingBottomRight:[115,90],maxZoom:8,animate:false})
  return true
 }
 function loadAirports(){
@@ -362,7 +421,7 @@ function renderRoute(item){
   if(route.via)root.append(create('p',(state.lang==='zh'?'经停 ':'Via ')+route.via.code))
   const button=create('button',t('journeyMap'),'soft-action journey-open');button.type='button'
   button.disabled=!journeySegments(item).length
-  button.addEventListener('click',()=>{state.followedHex=null;frameJourney(item);renderTrace();el('flight-follow').textContent=t('flightFollow');renderMarkers()})
+  button.addEventListener('click',()=>frameJourney(item))
   root.append(button,create('small',t('journeyHint'),'journey-hint'))
  }else root.append(create('p',t(routePending.has(item.callsign)?'flightRouteLoading':'flightRouteUnknown')))
 }
@@ -391,15 +450,24 @@ function renderTrace(){
  const hex=state.followedHex||(state.flightPanelOpen?state.selected?.hex:null)
  if(!hex)return
  const plane=state.flight.find(f=>f.hex===hex)||state.selected
- for(const points of journeySegments(plane)){
+ for(const [index,points] of journeySegments(plane).entries()){
   L.polyline(points,{renderer:traceRenderer,color:'#f4c680',weight:2,dashArray:'7 8',opacity:.85,interactive:false}).addTo(journeyLayer)
-  for(const p of [points[0],points.at(-1)])L.circleMarker(p,{radius:5,color:'#f4c680',fillOpacity:1,interactive:false}).addTo(journeyLayer)
+  for(const [end,p] of [points[0],points.at(-1)].entries()){
+   const marker=L.circleMarker(p,{radius:6,color:'#f4c680',fillOpacity:1,interactive:false}).addTo(journeyLayer)
+   if(journeyContext){
+    const route=itemRoute(plane),stops=[route.origin,route.via,route.destination].filter(Boolean),airport=stops[index+end]
+    const label=create('span',`${airport.city||airport.name||airport.code} · ${airport.code}`)
+    marker.bindTooltip(label,{permanent:true,direction:end?'top':'bottom',offset:[0,end?-12:12],className:'journey-airport-label',opacity:1})
+   }
+  }
  }
  for(const segment of trackSegments(state.flightLines.get(hex)||[]))
-  L.polyline(segment,{renderer:traceRenderer,color:'#62f3d1',weight:3,opacity:.9,interactive:false}).addTo(traceLayer)
+  L.polyline(segment.map(journeyPoint),{renderer:traceRenderer,color:'#62f3d1',weight:3,opacity:.9,interactive:false}).addTo(traceLayer)
 }
 function showFlightDetail(item){
+ endJourney()
  if(!item||item.kind!=='flight')return
+ if(state.followedHex!==item.hex)state.followedHex=null
  state.selected=item
  state.flightPanelOpen=true
  state.flightListOpen=false
@@ -566,13 +634,13 @@ function renderItems(){
 function renderMarkers(){
  renderTrace()
  markers.clearLayers();state.markers.clear()
- const visible=state.view==='saved'?viewItems():state.view==='radio'?[]:
+ const visible=journeyContext?[state.flight.find(p=>p.hex===state.selected?.hex)||state.selected].filter(Boolean):state.view==='saved'?viewItems():state.view==='radio'?[]:
   state.view==='sky'?state.sky:state.view==='nearby'?nearValues():
   state.view==='all'?[...state.sky,...state.event,...state.quake]:viewItems()
- for(const item of visible.filter(x=>x.point).slice(0,300)){
+ for(const item of visible.filter(x=>x.point&&(!journeyContext||x.hex===state.selected?.hex)).slice(0,300)){
   if(item.kind==='flight'){
    const track=Number.isFinite(item.heading)?Math.round(item.heading):0
-   const marker=L.marker(item.point,{
+   const marker=L.marker(journeyPoint(item.point),{
     icon:L.divIcon({
      className:'aircraft-marker'+(state.followedHex===item.hex?' following':''),
      html:'<span style="transform:rotate('+track+'deg)">✈</span>',
@@ -580,7 +648,7 @@ function renderMarkers(){
     })
    }).addTo(markers)
    marker.bindTooltip(item.title+' · '+formatAltitude(item.altitudeFt,state.lang),{direction:'top',opacity:.95})
-   marker.on('click',()=>selectItem(item,true))
+   marker.on('click',()=>selectItem(item,false))
    state.markers.set(item.id,marker)
    continue
   }
@@ -660,7 +728,8 @@ function showDetail(item){
 function selectItem(item,fly=true){
  if(item.kind==='flight'&&state.view==='flight'){
   showFlightDetail(item)
-  if(fly&&item.point&&!frameJourney(item))map.flyTo(item.point,Math.max(map.getZoom(),7),{duration:.65})
+  // Selection preserves the observation scale; only the explicit journey button fits the route.
+  if(fly&&item.point)map.panTo(item.point,{animate:!matchMedia('(prefers-reduced-motion: reduce)').matches,duration:.35})
   return
  }
  if(item.kind==='scene'&&state.cinema){
@@ -677,6 +746,7 @@ function selectItem(item,fly=true){
  renderItems()
 }
 function changeView(view){
+ endJourney()
  const old=state.view
  if(view!=='radio')radioProbeController?.abort()
  const previouslyWatching=old==='watch'
@@ -817,7 +887,7 @@ async function loadFlights(){
   while(state.flightLines.size>500)state.flightLines.delete(state.flightLines.keys().next().value)
   state.flightLastUpdate=Date.now()
   state.flightSamples=recordSessionSample(state.flightSamples,state.flight.length)
- if(state.view==='flight'&&firstLoaded&&state.flight.length>1&&!state.followedHex){
+ if(state.view==='flight'&&firstLoaded&&state.flight.length>1&&!state.followedHex&&!journeyContext){
    const bounds=L.latLngBounds(state.flight.map(item=>item.point))
    if(bounds.isValid())map.fitBounds(bounds.pad(.14),{maxZoom:6,animate:false})
   }
@@ -961,6 +1031,7 @@ function loadFavorites(){
 function persistFavorites(){writeLocal(LOCAL_SAVED,JSON.stringify([...state.saved.values()].slice(-150)))}
 
 export function mountWorldDesk(){
+ document.addEventListener('keydown',event=>{if(event.key==='Escape')endJourney()})
  el('sky-visuals').before(el('world-filters'))
  document.querySelector('.explore-grid').prepend(el('flight-highlights'))
  skyVisuals=createSkyVisuals(el('sky-visuals'),{lang:state.lang,onSelect:item=>selectItem(item,false),onDate:date=>seasonalCard?.selectDate(date)})
@@ -1040,6 +1111,7 @@ export function mountWorldDesk(){
   state.followedHex=item.hex;selectItem(item,true)
  })
  el('flight-area').addEventListener('change',event=>{
+  endJourney()
   state.flightRegion=event.target.value
   state.flightSamples=[]
   flightRequestSerial++
@@ -1064,6 +1136,7 @@ export function mountWorldDesk(){
   requestAnimationFrame(()=>map.invalidateSize({animate:false}))
  })
  el('close-inspector').addEventListener('click',()=>{
+  endJourney()
   state.flightPanelOpen=false
   renderMenu()
   requestAnimationFrame(()=>map.invalidateSize({animate:false}))

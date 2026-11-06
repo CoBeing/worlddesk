@@ -335,7 +335,7 @@ button:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
    No unlicensed map tiles or fake 24h aircraft totals. */
 .app-shell.flight-active{
   grid-template-columns:84px minmax(0,1fr);
-  height:100vh;min-height:700px;overflow:hidden;position:relative;
+  height:100vh;min-height:650px;overflow:hidden;position:relative;
 }
 .flight-active .nav{padding:19px 9px 13px}
 .flight-active .brand{margin:0 0 25px;justify-content:center}
@@ -591,3 +591,19 @@ button:focus-visible,summary:focus-visible{outline:2px solid #65ebbf;outline-off
 .sky-time-travel label{font-size:14px;color:#d4ece7}.sky-time-travel strong{font-size:13px;color:#f3d49e}.sky-time-travel input{width:100%;accent-color:#91dfc5;min-height:32px;cursor:ew-resize}.sky-time-travel button{border:1px solid #587276;border-radius:9px;color:#d9eee5;background:#203b42;padding:6px 12px;cursor:pointer}
 @media(max-width:1100px){.flight-play-actions button{font-size:11px;padding:7px 10px}.flight-active .inspector{top:190px}.sky-time-travel{grid-template-columns:1fr}.sky-time-travel strong{grid-row:2}.sky-time-travel input{grid-row:3}}
 @media(prefers-reduced-motion:reduce){.flight-play-actions button:active{transform:none}}
+
+/* A single-flight overview keeps the full canvas for the route, not the traffic cloud. */
+.flight-active.journey-overview .inspector,.flight-active.journey-overview .feed-pane{display:none!important}
+.journey-overview .offline-city-name{display:none}
+.journey-overview-bar{position:absolute;z-index:800;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 16px;background:rgba(8,28,42,.95);border:1px solid #42766b;border-radius:12px;color:#edf5f4}
+.journey-overview-bar strong{display:block;font-size:18px}
+.journey-overview-bar small{display:block;margin-top:5px;color:#9bb7bd;font-size:11px}
+.journey-overview-bar button{flex-shrink:0}
+.journey-airport-label{background:#102e3e;border:1px solid #e9be7c;color:#ffe1b4;box-shadow:0 3px 12px #0008;padding:6px 9px;font-size:12px;font-weight:600}
+
+.flight-active.journey-overview .flight-toolbar{display:none}
+
+.journey-airport-label{max-width:190px;white-space:normal;text-align:center}
+.journey-airport-label{width:max-content}
+
+.journey-overview .leaflet-control-zoom{display:none}
