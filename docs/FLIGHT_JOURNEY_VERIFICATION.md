@@ -12,3 +12,5 @@ Checks passed:
 - 45 unit tests and the frontend production build pass, including dateline geometry and polar-ring preservation.
 
 The overview uses the bundled coastline for immediate, consistent rendering. The chosen detailed/night map returns when leaving the overview. Dashed airport connections remain illustrative and are not presented as a measured flight path.
+
+Native Mac acceptance also passed on the Preview.9 bundle: selected live CQH8908 (MIG–NGB), opened the single-flight overview, inspected its rendered labels/route/aircraft, and returned to the detailed map with traffic and following state restored. The signed local updater archive passed signature verification and tamper rejection.
