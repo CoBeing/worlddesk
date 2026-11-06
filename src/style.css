@@ -543,3 +543,16 @@ button:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
   pointer-events:none!important;
 }
 .leaflet-tooltip.offline-city-name:before{display:none!important}
+
+/* Luo's cultural calendar stays inside the existing World Cinema / Pulse views. */
+.seasonal-calendar{margin:0 0 18px;border:1px solid #34534e;border-radius:12px;background:linear-gradient(110deg,#122d2c,#12232c);color:#dce9df}
+.seasonal-details>summary{padding:14px 16px;cursor:pointer;font-size:12px;line-height:1.7}
+.seasonal-heading{font-weight:650;color:#c5e9d5;margin-right:16px}.seasonal-summary{color:#94b9ac;font-size:11px}
+.seasonal-body{padding:0 16px 18px}.seasonal-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seasonal-controls label{font-size:11px;color:#aec6bc}.seasonal-controls input{font:inherit;color:#e4eee7;background:#12232c;border:1px solid #40615a;border-radius:5px;padding:7px;color-scheme:dark;min-height:36px}
+.seasonal-calendar button{border:1px solid #40615a;border-radius:6px;background:#1c3837;color:#d6ebdf;font-size:11px;min-height:36px;padding:7px 11px}
+.seasonal-calendar button:hover{background:#2a4845}.seasonal-calendar summary:focus-visible,.seasonal-calendar input:focus-visible,.seasonal-calendar textarea:focus-visible{outline:2px solid #65ebbf;outline-offset:3px}
+.seasonal-zone,.seasonal-caution,.seasonal-phenology-label{font-size:11px;color:#99b7ab;line-height:1.7}
+.seasonal-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.seasonal-lunar,.seasonal-phenology{font-size:17px;font-weight:500;margin:12px 0}.seasonal-term{font-size:13px;color:#c8e2b4}.seasonal-note{font-size:12px;line-height:1.9}
+.seasonal-copy{display:flex;gap:12px;align-items:center;margin-top:14px}.seasonal-status{font-size:11px;color:#c8e2b4}.seasonal-manual{display:block;margin-top:12px;font-size:12px}.seasonal-manual textarea{width:100%;display:block;margin-top:8px;background:#091e26;color:#dce9df;border:1px solid #40615a;border-radius:5px;padding:12px;font:12px/1.7 monospace}
+@media(max-width:1100px){.seasonal-columns{grid-template-columns:1fr;gap:0}.seasonal-summary{display:block;margin-left:12px}}

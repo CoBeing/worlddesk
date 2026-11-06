@@ -8,6 +8,7 @@ import {pickLanguage,translator} from './locale.mjs'
 import {CITIES,cityById,locateByIp,haversineKm} from './location.mjs'
 import {skyObservations,formatAtLocation} from './sky.mjs'
 import {createCinema} from './cinema.mjs'
+let seasonalCard
 import {FLIGHT_PROVIDER,FLIGHT_REGIONS,FLIGHT_RADIUS_NM,normalizeFlights,formatAltitude,aircraftDataAge} from './flights.mjs'
 import {deriveFlightInsights,recordSessionSample,makeWorldPulse} from './live-insights.mjs'
 
@@ -70,6 +71,7 @@ function toast(message){
  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{target.hidden=true},4400)
 }
 function applyLanguage(){
+ seasonalCard?.updateLanguage(state.lang)
  t=translator(state.lang)
  document.documentElement.lang=state.lang==='zh'?'zh-CN':'en'
  for(const element of document.querySelectorAll('[data-i18n]')){
@@ -395,6 +397,7 @@ function renderMenu(){
  for(const btn of document.querySelectorAll('[data-subview]')){
   btn.classList.toggle('active',btn.dataset.subview===state.view)
  }
+ el('seasonal-calendar').hidden=!(watching||['all','sky','nearby'].includes(state.view))
  el('cinema').hidden=!watching
  el('cinema-rail').hidden=!watching
  el('flight-toolbar').hidden=!flight
@@ -783,6 +786,7 @@ async function probeBridge(){
  }
 }
 function tick(){
+ seasonalCard?.tick()
  el('clock').textContent=new Intl.DateTimeFormat(state.lang==='zh'?'zh-CN':'en-US',{
   hour:'2-digit',minute:'2-digit',hour12:false
  }).format(new Date())
@@ -798,6 +802,9 @@ function loadFavorites(){
 function persistFavorites(){writeLocal(LOCAL_SAVED,JSON.stringify([...state.saved.values()].slice(-150)))}
 
 export function mountWorldDesk(){
+ void import('./seasonal-card.mjs').then(({createSeasonalCard})=>{
+  seasonalCard=createSeasonalCard(el('seasonal-calendar'),{lang:state.lang,openSource:openKnown})
+ }).catch(()=>{el('seasonal-calendar').hidden=true})
  initializeMap()
  loadFavorites()
  state.cinema=createCinema({lang:state.lang,onToast:toast,onScene:scene=>{

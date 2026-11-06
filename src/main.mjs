@@ -22,7 +22,7 @@ app.innerHTML=[
 '<section class="content">',
 ' <header class="top-bar"><div><span class="kicker" data-i18n="kicker">YOUR WINDOW TO THE WORLD</span><h1 data-i18n="tagline">打开世界，随时去远方。</h1></div>',
 '  <div class="top-actions"><label class="lang-select">🌐 <select id="language-select" aria-label="Language"><option value="auto">System</option><option value="zh">中文</option><option value="en">English</option></select></label><span id="clock" class="clock"></span><button id="refresh" class="icon-button" title="Refresh">↻</button></div></header>',
-' <div class="location-strip"><span class="location-symbol">⌖</span><span class="location-label" data-i18n="labelLocation">观测地点</span><strong id="location-label"></strong><select id="city-select" aria-label="City"></select><small id="location-privacy" data-i18n="labelIpHint">IP 位置仅作估计，可随时修改</small></div><section id="cinema" class="cinema" aria-label="Real world images">',
+' <div class="location-strip"><span class="location-symbol">⌖</span><span class="location-label" data-i18n="labelLocation">观测地点</span><strong id="location-label"></strong><select id="city-select" aria-label="City"></select><small id="location-privacy" data-i18n="labelIpHint">IP 位置仅作估计，可随时修改</small></div><section id="seasonal-calendar" class="seasonal-calendar" aria-label="Seasonal calendar"></section><section id="cinema" class="cinema" aria-label="Real world images">',
 '    <img id="cinema-image" class="cinema-image" src="/scenes/yangshuo.jpg" alt="Real scenery photograph from Yangshuo, China"/>',
 '    <div class="cinema-gradient"></div>',
 '    <div class="cinema-top"><span id="cinema-category" class="cinema-category">中国实景 · 历史照片</span><span id="cinema-time" class="cinema-time">2017 · Photo archive</span></div>',

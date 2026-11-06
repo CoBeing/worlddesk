@@ -20,6 +20,12 @@ WorldDesk is an independent CoBeing ecosystem application. The CoBeing platform 
 - **Local Bridge included**: the desktop install carries the open-source eaopen/local-bridge runtime as a bundled sidecar. The app reads the actual bundled binary version, with an opt-in self-test. No separate installation, background service, model account or third-party communications permission is required.
 - **Built-in astronomy and world observations**: internal sky calculations and world-event map; no dependency on CoBeing or God’s Eye View UI. CoBeing remains optional behind the scenes and is not connected in this Preview.
 
+## Cultural calendar · Luo integration
+
+World Cinema and World Pulse now include a compact, expandable **岁时 / Seasonal calendar** card: Chinese lunar dates, solar-term countdowns, traditional phenology, sourced astronomical notes and Markdown export to your journal. It follows the app language; Chinese phenology names remain explicitly labelled as Chinese.
+
+Calculations run locally using pinned `lunar-typescript` (MIT), for civil dates 1900–2100. The calendar uses **Beijing time UTC+8**, independently of the selected observation city; phenology is cultural tradition, not local weather. No Luo API, Java runtime, annual data pack, account or new background service is needed. The former standalone Luo project is paused; this capability is maintained here. See [scope and provenance](docs/SEASONAL_CALENDAR.md).
+
 ## Download
 
 **[Get WorldDesk Preview on GitHub Releases](https://github.com/CoBeing/worlddesk/releases)**
