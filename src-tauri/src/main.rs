@@ -149,6 +149,7 @@ fn open_external(app: tauri::AppHandle, url: String) -> Result<(), String> {
         "epic.gsfc.nasa.gov",
         "www.data.jma.go.jp",
         "www.adsb.lol",
+        "www.hko.gov.hk",
     ];
     if !allowed.contains(&host) {
         return Err("当前仅开放经过确认的官方探索入口".into());

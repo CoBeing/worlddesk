@@ -39,3 +39,7 @@ Public-IP geolocation is requested by the client directly from GeoJS, then ipwho
 ## Data and map licensing
 
 Mainland mapping APIs often require issued keys and special business terms. OpenFreeMap allows free commercial use with attribution and no key, but actual connectivity from mainland China is not guaranteed; the preview falls back to bundled Natural Earth and manually curated city labels. Neither visual map is a navigational or emergency tool. All feeds display source and freshness labels as appropriate; real, delayed, predicted and simulated observations must remain distinct.
+
+## 2026-11-06: Luo cultural calendar consolidated
+
+Implemented as a local, bilingual seasonal card within existing World Cinema / Pulse views. No separate service or annual data maintenance. See [scope and provenance](SEASONAL_CALENDAR.md).
