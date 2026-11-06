@@ -14,3 +14,5 @@ Checks passed:
 The overview uses the bundled coastline for immediate, consistent rendering. The chosen detailed/night map returns when leaving the overview. Dashed airport connections remain illustrative and are not presented as a measured flight path.
 
 Native Mac acceptance also passed on the Preview.9 bundle: selected live CQH8908 (MIG–NGB), opened the single-flight overview, inspected its rendered labels/route/aircraft, and returned to the detailed map with traffic and following state restored. The signed local updater archive passed signature verification and tamper rejection.
+
+Release: https://github.com/CoBeing/worlddesk/releases/tag/v0.1.0-preview.9 . Windows build/test/package job in run 42235812350 passed. Because the Mac runner remained queued, the release uses the locally built, natively tested Mac ARM64 bundle from the same application commit (`1a0f83c`); the remaining CI run was cancelled after Windows upload. Downloaded release files passed SHA-256 and updater signature/tamper checks for both platforms. Published updater manifest reports Preview.9 with both platform URLs.
