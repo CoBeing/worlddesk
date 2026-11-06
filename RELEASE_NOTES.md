@@ -1,6 +1,12 @@
-# WorldDesk v0.1.0-preview.9 — Keep your view, explore one journey
+# WorldDesk v0.1.0-preview.10 — Correct aircraft direction
 
 **macOS Apple Silicon + Windows x64 · preview · no account required.**
+
+## Aircraft direction fix
+
+- Replaced the font-dependent airplane character with an explicitly north-facing SVG. Reported compass track now rotates the aircraft correctly on every platform.
+- Unknown track uses a neutral dot instead of implying north.
+- Verified actual rendered nose vectors for north/east/south/west, plus all three source adapters; 47 unit tests pass.
 
 ## Flight map experience
 

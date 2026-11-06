@@ -14,6 +14,7 @@ let seasonalCard
 import {createRadioHealth,probeRadio} from './radio-health.mjs'
 import {journeyPoints} from './journey.mjs'
 import {unwrapLand} from './map-geometry.mjs'
+import {aircraftIcon} from './aircraft-icon.mjs'
 import {adaptFr24,fr24Bounds} from './fr24.mjs'
 import {appendTrack,trackSegments,normalizeRoute} from './flight-tracks.mjs'
 import {mergeFlightSources,FLIGHT_SOURCES,FLIGHT_REGIONS,FLIGHT_RADIUS_NM,formatAltitude,aircraftDataAge} from './flights.mjs'
@@ -639,11 +640,10 @@ function renderMarkers(){
   state.view==='all'?[...state.sky,...state.event,...state.quake]:viewItems()
  for(const item of visible.filter(x=>x.point&&(!journeyContext||x.hex===state.selected?.hex)).slice(0,300)){
   if(item.kind==='flight'){
-   const track=Number.isFinite(item.heading)?Math.round(item.heading):0
    const marker=L.marker(journeyPoint(item.point),{
     icon:L.divIcon({
      className:'aircraft-marker'+(state.followedHex===item.hex?' following':''),
-     html:'<span style="transform:rotate('+track+'deg)">✈</span>',
+     html:aircraftIcon(item.heading),
      iconSize:[29,29],iconAnchor:[14,14]
     })
    }).addTo(markers)

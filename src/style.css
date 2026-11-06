@@ -607,3 +607,5 @@ button:focus-visible,summary:focus-visible{outline:2px solid #65ebbf;outline-off
 .journey-airport-label{width:max-content}
 
 .journey-overview .leaflet-control-zoom{display:none}
+
+.aircraft-marker svg{display:block;width:21px;height:21px;transform-origin:50% 50%}
